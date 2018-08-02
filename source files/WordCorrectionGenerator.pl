@@ -160,14 +160,12 @@ print "------Next Word: " . $word . "------\n";
             }
             
             my $remainingMaxIndex = scalar(@remainderLetters);
-            if ($remainingMaxIndex >= 1)
-            {
+            if ($remainingMaxIndex >= 1) {
                 for(my $subIndex=0; $subIndex < $remainingMaxIndex-1; $subIndex++)
                 {   
                     @remainderLetters[$subIndex, $subIndex+1] = @remainderLetters[$subIndex+1, $subIndex];
                 
-                    if (PRINT_PERMUTATION)
-                    {
+                    if (PRINT_PERMUTATION) {
                         if ($index == 0){
                             print @remainderLetters,"\n";
                         }
