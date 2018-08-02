@@ -27,15 +27,13 @@ while (my $word = <$fh>)
     #Before even beginning look through the entire wordlist for duplicates
     foreach my $completedWords (@completedWords)
     {
-        if ($word eq $completedWords)
-        {
+        if ($word eq $completedWords) {
             print "skipping word: " . $word . "\n";
             $foundCompletedWord = 1;
             last;
         }
     }#otherwise just skip the word all together and move on
-    if ($foundCompletedWord == 1)
-    {
+    if ($foundCompletedWord == 1) {
         next;
     }
     push(@completedWords, $word);
@@ -115,12 +113,10 @@ print "------Next Word: " . $word . "------\n";
                 }
             }
             #if it is not, then check to see if it's a word in the dictionary and/or a word we've already generated
-            if ($foundSpellingAsWord == 0)
-            {
+            if ($foundSpellingAsWord == 0) {
                 foreach my $aRealWord (@dictionary)
                 {
-                    if ($newSpelling eq $aRealWord)
-                    {
+                    if ($newSpelling eq $aRealWord) {
                         $foundGeneratedWord = 1;
                         print "found " . $newSpelling , "\n";
                         last;
@@ -128,14 +124,12 @@ print "------Next Word: " . $word . "------\n";
                 }
                 foreach my $aGeneratedWord (@generatedWords)
                 {
-                    if ($newSpelling eq $aGeneratedWord)
-                    {
+                    if ($newSpelling eq $aGeneratedWord) {
                         $foundGeneratedWord++;
                     }
                 }
                 
-                if ($foundGeneratedWord == 0)
-                {
+                if ($foundGeneratedWord == 0) {
                     print $fh_out "::" . $newSpelling . "::" . $word, "\n";
                 }
                 push(@generatedWords, $newSpelling);
@@ -154,8 +148,7 @@ print "------Next Word: " . $word . "------\n";
                
             my @remainderLetters = @string_as_array[$index .. scalar(@string_as_array)-1];
             
-            if (PRINT_PERMUTATION)
-            {
+            if (PRINT_PERMUTATION) {
                 print @firstLetters, "===" , @remainderLetters, "\n";
             }
             
@@ -175,8 +168,7 @@ print "------Next Word: " . $word . "------\n";
                         }
                     }
                     
-                    if ($index == 0)
-                    {
+                    if ($index == 0) {
                         $newSpelling = join('',@remainderLetters);
                     }
                     else
@@ -186,18 +178,15 @@ print "------Next Word: " . $word . "------\n";
                     
                     foreach my $orgWord (@orgWordList)
                     {
-                        if ($newSpelling eq $orgWord)
-                        {
+                        if ($newSpelling eq $orgWord) {
                             $foundSpellingAsWord = 1;
                             last;
                         }
                     }
-                    if ($foundSpellingAsWord == 0)
-                    {
+                    if ($foundSpellingAsWord == 0) {
                         foreach my $aRealWord (@dictionary)
                         {
-                            if ($newSpelling eq $aRealWord)
-                            {
+                            if ($newSpelling eq $aRealWord) {
                                 $foundGeneratedWord = 1;
                                 print "found " . $newSpelling , "\n";
                                 last;
@@ -205,14 +194,12 @@ print "------Next Word: " . $word . "------\n";
                         }
                         foreach my $aGeneratedWord (@generatedWords)
                         {
-                            if ($newSpelling eq $aGeneratedWord)
-                            {
+                            if ($newSpelling eq $aGeneratedWord) {
                                 $foundGeneratedWord++;
                             }
                         }
                         
-                        if ($foundGeneratedWord == 0)
-                        {
+                        if ($foundGeneratedWord == 0) {
                             print $fh_out "::" . $newSpelling . "::" . $word, "\n";
                         }
                         push(@generatedWords, $newSpelling);
