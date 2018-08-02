@@ -94,6 +94,11 @@ print "------Next Word: " . $word . "------\n";
             # }
         # }
         ##///////////////////////////////////////////////////////////////////////////
+        
+        
+        ##///////////////////////////////////////////////////////////////////////////
+        ## First delete 1 letter at time to fix simple errors in spelling
+        ##///////////////////////////////////////////////////////////////////////////
         for (my $index=0; $index < scalar(@string_as_array); $index++)
         {
             $foundSpellingAsWord = 0;
@@ -135,7 +140,9 @@ print "------Next Word: " . $word . "------\n";
                 push(@generatedWords, $newSpelling);
             }
         }    
-        
+        ##///////////////////////////////////////////////////////////////////////////
+        ## Next go through each and every letter and swap it with the next position 
+        ##///////////////////////////////////////////////////////////////////////////
         for (my $index=0; $index < scalar(@string_as_array)-1; $index++)
         {
             $foundSpellingAsWord = 0;
@@ -206,11 +213,14 @@ print "------Next Word: " . $word . "------\n";
                     }
                 }
                 
-                $foundSpellingAsWord = 0;
-                $foundGeneratedWord  = 0;
-                @firstLetters = @string_as_array[0 .. $index];
-                @remainderLetters = @string_as_array[$index+1 .. scalar(@string_as_array)-1];
-                $remainingMaxIndex = scalar(@remainderLetters);
+                ##///////////////////////////////////////////////////////////////////////////
+                ## Lastly, rotate each subset of letters 
+                ##///////////////////////////////////////////////////////////////////////////
+                # $foundSpellingAsWord = 0;
+                # $foundGeneratedWord  = 0;
+                # @firstLetters = @string_as_array[0 .. $index];
+                # @remainderLetters = @string_as_array[$index+1 .. scalar(@string_as_array)-1];
+                # $remainingMaxIndex = scalar(@remainderLetters);
                 # for(my $subIndex=0; $subIndex < $remainingMaxIndex-1; $subIndex++)
                 # {   
                     # push (@remainderLetters, shift(@remainderLetters));
