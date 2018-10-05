@@ -8,37 +8,42 @@ use constant PRINT_PERMUTATION => 0;
 #!perl -w
 use strict;
 use warnings;
-use Win32::GUI();
- 
-# This sample demonstrates GetOpenFileName
- 
-my $lastfile = 'Wordlist.txt';
- 
-# single file with graphics file filters
-
-my ( @file, $file );
-my ( @parms );
-push @parms,
-  -filter =>
-    [ 'TXT - Normal text File', '*.txt',
-      'All Files - *', '*'
-    ],
-  -directory => ".\\",
-  -title => 'Select a file';
-
-push @parms, -file => $lastfile  if $lastfile;
-@file = Win32::GUI::GetOpenFileName ( @parms );
-print "$_\n" for @file;
-print join('',@file), "\n";
-print "index of null:", index( $file[ 0 ], "\0" ), "\n";
-print "index of space:", index( $file[ 0 ], " " ), "\n";
-
 
 my $newSpelling;
 my @completedWords;
 my @generatedWords;
+my $fh;
 
-open(my $fh, '<', join('',@file)) or die "Failed to open file for reading\n";
+eval "use Win32::GUI()";
+if($@){
+    print "missing the library Win32::GUI()\n";
+    open($fh, '<', 'wordlist.txt') or die "Failed to open file for reading\n";
+}
+else {
+    my $lastfile = 'Wordlist.txt';
+     
+    # single file with graphics file filters
+
+    my ( @file, $file );
+    my ( @parms );
+    push @parms,
+      -filter =>
+        [ 'TXT - Normal text File', '*.txt',
+          'All Files - *', '*'
+        ],
+      -directory => ".\\",
+      -title => 'Select a file';
+
+    push @parms, -file => $lastfile  if $lastfile;
+    @file = Win32::GUI::GetOpenFileName ( @parms );
+    print "$_\n" for @file;
+    print join('',@file), "\n";
+    print "index of null:",  index( $file[ 0 ], "\0" ), "\n";
+    print "index of space:", index( $file[ 0 ], " " ), "\n";
+    open($fh, '<', join('',@file)) or die "Failed to open file for reading\n";
+}
+
+
 chomp(my @orgWordList = <$fh>);
 close $fh;
 open(my $bigWordlist, '<', "Wordlist 100000 frequency weighted (Google Books).txt") or die "Failed to open file for reading\n";
@@ -58,7 +63,7 @@ while (my $word = <$fh>)
     foreach my $completedWords (@completedWords)
     {
         if ($word eq $completedWords) {
-            print "skipping word: " . $word . "\n";
+            print "line#" . $. . " skipping word: " . $word . "\n";
             $foundCompletedWord = 1;
             last;
         }
@@ -67,7 +72,9 @@ while (my $word = <$fh>)
         next;
     }
     push(@completedWords, $word);
-print "------Next Word: " . $word . "------\n";
+    
+    print "line#" . $. . " ------Next Word: " . $word . "------\n";
+    
     # /////////////////////////////////////////////////////////////
     my @string_as_array = split('',$word);
     # my @arr = (2);

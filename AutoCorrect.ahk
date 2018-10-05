@@ -2890,10 +2890,17 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::hypocrit::hypocrite
 ::hypocrits::hypocrites
 ::i;d::I'd
-::i"m::I'm
+::i"d::I'd
 ::i'd::I'd
+::i"m::I'm
 ::i'm::I'm
+::im::I'm
+::i"ll::I'll
 ::i'll::I'll
+::i"ve::I've
+::i've::I've
+::iv'e::I've
+::ive::I've
 ::iconclastic::iconoclastic
 ::idae::idea
 ::idaeidae::idea
@@ -5602,10 +5609,6 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::defualt::default 
 ::rescheulde::reschedule 
 ::mintues::minutes 
-::dont::don't
-::i"ve::I've
-::i"m::I'm
-::i"d::I'd
 ::theyre::they're
 ::theyll::they'll
 ::theyd::they'd
@@ -5617,7 +5620,6 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::apprecaite::appreciate
 ::funciton::function
 ::srory::sorry
-::iv'e::I've
 ::probalby::probably
 ::locaation::location
 ::locaiton::location
@@ -5889,7 +5891,6 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::gbe::GbE
 ::Unforutntely::Unfortunately
 ::resopnd::respond
-::ive::I've
 ::Ocne::Once
 ::Welcoem::Welcome
 ::osemthing::something
