@@ -19,7 +19,8 @@ if($@){
     print "missing the library Win32::GUI()\n";
     open($fh, '<', 'wordlist.txt') or die "Failed to open file for reading\n";
 }
-else {
+else 
+{
     my $lastfile = 'Wordlist.txt';
      
     # single file with graphics file filters
@@ -32,38 +33,51 @@ else {
           'All Files - *', '*'
         ],
       -directory => ".\\",
-      -title => 'Select a file';
+      -title => 'Select a file containing words for autocorrect';
 
     push @parms, -file => $lastfile  if $lastfile;
     @file = Win32::GUI::GetOpenFileName ( @parms );
-    print "$_\n" for @file;
-    print join('',@file), "\n";
+    #print "$_\n" for @file;
+	#////////////////////////////////////////////////////////////////////////////////////
+	# The Perl programming language join() function is used to connect 
+	# all the elements of a specific list or array into a single string 
+	# using a specified joining expression. The list is concatenated 
+	# into one string with the specified joining element contained between each item
+	#/////////////////////////////////////////////////////////////////////////////////////
+    #print join('',@file), "\n"; #ONLY NEED TO USE JOIN IF SELECTING MULTIPLE FILES 
     print "index of null:",  index( $file[ 0 ], "\0" ), "\n";
     print "index of space:", index( $file[ 0 ], " " ), "\n";
-    open($fh, '<', join('',@file)) or die "Failed to open file for reading\n";
+    #open($fh, '<', join('',@file)) or die "Failed to open file for reading\n"; #ONLY NEED TO USE JOIN IF SELECTING MULTIPLE FILES 
+	open($fh, '<', @file) or die "Failed to open file for reading\n";
 }
 
 
 chomp(my @orgWordList = <$fh>);
+#foreach (@orgWordList) {
+#  print "$_\n";
+#}
 close $fh;
 open(my $bigWordlist, '<', "Wordlist 100000 frequency weighted (Google Books).txt") or die "Failed to open file for reading\n";
 chomp(my @dictionary = <$bigWordlist>);
 close $bigWordlist;
 
-open($fh, '<', "wordlist.txt") or die "Failed to open file for reading\n";
+#open($fh, '<', "wordlist.txt") or die "Failed to open file for reading\n";
 open(my $fh_out, '>', "generatedwords.ahk")    or die "Failed to open file for writing\n";
 
-while (my $word = <$fh>)
+#while (my $word = <$fh>)
+my $iterCount = 0;
+foreach my $word (@orgWordList)
 {  
     my $foundSpellingAsWord = 0;
     my $foundGeneratedWord = 0;
     my $foundCompletedWord = 0;
+	$iterCount ++;
     chomp $word;
     #Before even beginning look through the entire wordlist for duplicates
     foreach my $completedWords (@completedWords)
     {
         if ($word eq $completedWords) {
-            print "line#" . $. . " skipping word: " . $word . "\n";
+            print "line#" . $iterCount . " skipping word: " . $word . "\n";
             $foundCompletedWord = 1;
             last;
         }
@@ -73,7 +87,7 @@ while (my $word = <$fh>)
     }
     push(@completedWords, $word);
     
-    print "line#" . $. . " ------Next Word: " . $word . "------\n";
+    print "line#" . $iterCount . "------Next Word: " . $word . "------\n";
     
     # /////////////////////////////////////////////////////////////
     my @string_as_array = split('',$word);
