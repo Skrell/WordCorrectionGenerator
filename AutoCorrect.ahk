@@ -491,6 +491,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 :?:oen::one
 :?:iaion::iation
 :?:cims::cisms
+:?:lyl::lly
 ;------------------------------------------------------------------------------
 ; Word beginnings
 ;------------------------------------------------------------------------------
@@ -5603,6 +5604,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 
 ::fpga::FPGA
 ::pcie::PCIe
+::icd::ICD
 ;-------------------------------------------------------------------------------
 ; Anything below this point was added to the script by the user via the Win+H hotkey.
 ;-------------------------------------------------------------------------------
