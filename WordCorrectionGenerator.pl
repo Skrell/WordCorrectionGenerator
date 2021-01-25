@@ -37,17 +37,17 @@ else
     push @parms, -file => $lastfile  if $lastfile;
     @file = Win32::GUI::GetOpenFileName ( @parms );
     #print "$_\n" for @file;
-	#////////////////////////////////////////////////////////////////////////////////////
-	# The Perl programming language join() function is used to connect 
-	# all the elements of a specific list or array into a single string 
-	# using a specified joining expression. The list is concatenated 
-	# into one string with the specified joining element contained between each item
-	#/////////////////////////////////////////////////////////////////////////////////////
+    #////////////////////////////////////////////////////////////////////////////////////
+    # The Perl programming language join() function is used to connect 
+    # all the elements of a specific list or array into a single string 
+    # using a specified joining expression. The list is concatenated 
+    # into one string with the specified joining element contained between each item
+    #/////////////////////////////////////////////////////////////////////////////////////
     #print join('',@file), "\n"; #ONLY NEED TO USE JOIN IF SELECTING MULTIPLE FILES 
     print "index of null:",  index( $file[ 0 ], "\0" ), "\n";
     print "index of space:", index( $file[ 0 ], " " ), "\n";
     #open($fh, '<', join('',@file)) or die "Failed to open file for reading\n"; #ONLY NEED TO USE JOIN IF SELECTING MULTIPLE FILES 
-	open($fh, '<', @file) or die "Failed to open file for reading\n";
+    open($fh, '<', @file) or die "Failed to open file for reading\n";
 }
 
 
@@ -70,7 +70,7 @@ foreach my $word (@orgWordList)
     my $foundSpellingAsWord = 0;
     my $foundGeneratedWord = 0;
     my $foundCompletedWord = 0;
-	$iterCount ++;
+    $iterCount ++;
     chomp $word;
     #Before even beginning look through the entire wordlist for duplicates
     foreach my $completedWords (@completedWords)
@@ -160,16 +160,16 @@ foreach my $word (@orgWordList)
             $newMissSpelling = join('',@splicedString);
             #first check if the new spelling is a word from the wordlist.txt (assuming the 2 files are different)
             if (scalar(@orgWordList) != scalar(@dictionary))
-			{
-				foreach my $orgWord (@orgWordList)
-				{
-					if ($newMissSpelling eq $orgWord)
-					{
-						$foundSpellingAsWord = 1;
-						last;
-					}
-				}
-			}	
+            {
+                foreach my $orgWord (@orgWordList)
+                {
+                    if ($newMissSpelling eq $orgWord)
+                    {
+                        $foundSpellingAsWord = 1;
+                        last;
+                    }
+                }
+            }   
             #if it is not, then check to see if it's a word in the dictionary and/or a word we've already generated
             if ($foundSpellingAsWord == 0) {
                 foreach my $aRealWord (@dictionary)
@@ -184,13 +184,13 @@ foreach my $word (@orgWordList)
                 {
                     if ($newMissSpelling eq $aGeneratedWord) {
                         $foundGeneratedWord++;
-						last;
+                        last;
                     }
                 }
                 
                 if ($foundGeneratedWord == 0) {
                     print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
-					push(@missSpelledWords, $newMissSpelling);
+                    push(@missSpelledWords, $newMissSpelling);
                 }
             }
         }    
@@ -237,16 +237,16 @@ foreach my $word (@orgWordList)
                         $newMissSpelling = join('',@firstLetters) . join('',@remainderLetters);
                     }
                     
-					if (scalar(@orgWordList) != scalar(@dictionary))
-					{
-						foreach my $orgWord (@orgWordList)
-						{
-							if ($newMissSpelling eq $orgWord) {
-								$foundSpellingAsWord = 1;
-								last;
-							}
-						}
-					}
+                    if (scalar(@orgWordList) != scalar(@dictionary))
+                    {
+                        foreach my $orgWord (@orgWordList)
+                        {
+                            if ($newMissSpelling eq $orgWord) {
+                                $foundSpellingAsWord = 1;
+                                last;
+                            }
+                        }
+                    }
                     if ($foundSpellingAsWord == 0) {
                         foreach my $aRealWord (@dictionary)
                         {
@@ -260,13 +260,13 @@ foreach my $word (@orgWordList)
                         {
                             if ($newMissSpelling eq $aGeneratedWord) {
                                 $foundGeneratedWord++;
-								last;
+                                last;
                             }
                         }
                         
                         if ($foundGeneratedWord == 0) {
                             print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
-							push(@missSpelledWords, $newMissSpelling);
+                            push(@missSpelledWords, $newMissSpelling);
                         }
                     }
                 }
