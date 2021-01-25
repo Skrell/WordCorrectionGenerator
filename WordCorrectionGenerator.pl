@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-
 use strict;
 use warnings;
 use IO::Handle;
@@ -9,9 +8,9 @@ use constant PRINT_PERMUTATION => 0;
 use strict;
 use warnings;
 
-my $newSpelling;
+my $newMissSpelling;
 my @completedWords;
-my @generatedWords;
+my @missSpelledWords;
 my $fh;
 
 eval "use Win32::GUI()";
@@ -110,14 +109,14 @@ foreach my $word (@orgWordList)
             # push (@string_as_array, shift(@string_as_array));
             # # print @string_as_array[$index],"\n";
             # # print @string_as_array,"\n";
-            # $newSpelling = join('',@string_as_array);
+            # $newMissSpelling = join('',@string_as_array);
             # if (PRINT_PERMUTATION)
             # {
-                # print $newSpelling,"\n";
+                # print $newMissSpelling,"\n";
             # }
             # foreach my $orgWord (@orgWordList)
             # {
-                # if ($newSpelling eq $orgWord)
+                # if ($newMissSpelling eq $orgWord)
                 # {
                     # # print "same word found!\n";
                     # $foundSpellingAsWord = 1;
@@ -127,21 +126,21 @@ foreach my $word (@orgWordList)
             
             # if ($foundSpellingAsWord == 0)
             # {
-                # # print $newSpelling, "\n";
+                # # print $newMissSpelling, "\n";
                 # foreach my $aRealWord (@dictionary)
                 # {
-                    # if ($newSpelling eq $aRealWord)
+                    # if ($newMissSpelling eq $aRealWord)
                     # {
                        # $foundGeneratedWord  = 1;
-                        # print "found " . $newSpelling , "\n";
+                        # print "found " . $newMissSpelling , "\n";
                         # last;
                     # }
                 # }
                 # if ($foundGeneratedWord == 0)
                 # {
-                    # print $fh_out "::" . $newSpelling . "::" . $word, "\n";
+                    # print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
                 # }
-                # push(@generatedWords, $newSpelling);
+                # push(@missSpelledWords, $newMissSpelling);
             # }
         # }
         ##///////////////////////////////////////////////////////////////////////////
@@ -158,37 +157,41 @@ foreach my $word (@orgWordList)
             my @splicedString = @string_as_array;
             splice(@splicedString, $index, 1);
             
-            $newSpelling = join('',@splicedString);
-            #first check if the new spelling is a word from the wordlist.txt
-            foreach my $orgWord (@orgWordList)
-            {
-                if ($newSpelling eq $orgWord)
-                {
-                    $foundSpellingAsWord = 1;
-                    last;
-                }
-            }
+            $newMissSpelling = join('',@splicedString);
+            #first check if the new spelling is a word from the wordlist.txt (assuming the 2 files are different)
+            if (scalar(@orgWordList) != scalar(@dictionary))
+			{
+				foreach my $orgWord (@orgWordList)
+				{
+					if ($newMissSpelling eq $orgWord)
+					{
+						$foundSpellingAsWord = 1;
+						last;
+					}
+				}
+			}	
             #if it is not, then check to see if it's a word in the dictionary and/or a word we've already generated
             if ($foundSpellingAsWord == 0) {
                 foreach my $aRealWord (@dictionary)
                 {
-                    if ($newSpelling eq $aRealWord) {
+                    if ($newMissSpelling eq $aRealWord) {
                         $foundGeneratedWord = 1;
-                        print "found " . $newSpelling , "\n";
+                        print "found " . $newMissSpelling , "\n";
                         last;
                     }
                 }
-                foreach my $aGeneratedWord (@generatedWords)
+                foreach my $aGeneratedWord (@missSpelledWords)
                 {
-                    if ($newSpelling eq $aGeneratedWord) {
+                    if ($newMissSpelling eq $aGeneratedWord) {
                         $foundGeneratedWord++;
+						last;
                     }
                 }
                 
                 if ($foundGeneratedWord == 0) {
-                    print $fh_out "::" . $newSpelling . "::" . $word, "\n";
+                    print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
+					push(@missSpelledWords, $newMissSpelling);
                 }
-                push(@generatedWords, $newSpelling);
             }
         }    
         ##///////////////////////////////////////////////////////////////////////////
@@ -227,40 +230,44 @@ foreach my $word (@orgWordList)
                     }
                     
                     if ($index == 0) {
-                        $newSpelling = join('',@remainderLetters);
+                        $newMissSpelling = join('',@remainderLetters);
                     }
                     else
                     {
-                        $newSpelling = join('',@firstLetters) . join('',@remainderLetters);
+                        $newMissSpelling = join('',@firstLetters) . join('',@remainderLetters);
                     }
                     
-                    foreach my $orgWord (@orgWordList)
-                    {
-                        if ($newSpelling eq $orgWord) {
-                            $foundSpellingAsWord = 1;
-                            last;
-                        }
-                    }
+					if (scalar(@orgWordList) != scalar(@dictionary))
+					{
+						foreach my $orgWord (@orgWordList)
+						{
+							if ($newMissSpelling eq $orgWord) {
+								$foundSpellingAsWord = 1;
+								last;
+							}
+						}
+					}
                     if ($foundSpellingAsWord == 0) {
                         foreach my $aRealWord (@dictionary)
                         {
-                            if ($newSpelling eq $aRealWord) {
+                            if ($newMissSpelling eq $aRealWord) {
                                 $foundGeneratedWord = 1;
-                                print "found " . $newSpelling , "\n";
+                                print "found " . $newMissSpelling , "\n";
                                 last;
                             }
                         }
-                        foreach my $aGeneratedWord (@generatedWords)
+                        foreach my $aGeneratedWord (@missSpelledWords)
                         {
-                            if ($newSpelling eq $aGeneratedWord) {
+                            if ($newMissSpelling eq $aGeneratedWord) {
                                 $foundGeneratedWord++;
+								last;
                             }
                         }
                         
                         if ($foundGeneratedWord == 0) {
-                            print $fh_out "::" . $newSpelling . "::" . $word, "\n";
+                            print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
+							push(@missSpelledWords, $newMissSpelling);
                         }
-                        push(@generatedWords, $newSpelling);
                     }
                 }
                 
@@ -283,12 +290,12 @@ foreach my $word (@orgWordList)
                         # print @remainderLetters,"\n";
                     # }
                     # # print @string_as_array[$index],"\n";
-                    # $newSpelling = join('',@firstLetters) . join('',@remainderLetters);
-                    # # print $newSpelling,"\n";
+                    # $newMissSpelling = join('',@firstLetters) . join('',@remainderLetters);
+                    # # print $newMissSpelling,"\n";
                     
                     # foreach my $orgWord (@orgWordList)
                     # {
-                        # if ($newSpelling eq $orgWord)
+                        # if ($newMissSpelling eq $orgWord)
                         # {
                             # # print "same word found!\n";
                             # $foundSpellingAsWord = 1;
@@ -299,25 +306,25 @@ foreach my $word (@orgWordList)
                     # {
                         # foreach my $aRealWord (@dictionary)
                         # {
-                            # if ($newSpelling eq $aRealWord)
+                            # if ($newMissSpelling eq $aRealWord)
                             # {
                                 # $foundGeneratedWord = 1;
-                                # print "found " . $newSpelling , "\n";
+                                # print "found " . $newMissSpelling , "\n";
                                 # last;
                             # }
                         # }
-                        # foreach my $aGeneratedWord (@generatedWords)
+                        # foreach my $aGeneratedWord (@missSpelledWords)
                         # {
-                            # if ($newSpelling eq $aGeneratedWord)
+                            # if ($newMissSpelling eq $aGeneratedWord)
                             # {
                                 # $foundGeneratedWord++;
                             # }
                         # }
                         # if ($foundGeneratedWord == 0)
                         # {
-                            # print $fh_out "::" . $newSpelling . "::" . $word, "\n";
+                            # print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
                         # }
-                        # push(@generatedWords, $newSpelling);
+                        # push(@missSpelledWords, $newMissSpelling);
                     # }
                 # }
             }
