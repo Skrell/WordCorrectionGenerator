@@ -56,7 +56,8 @@ chomp(my @orgWordList = <$fh>);
 #  print "$_\n";
 #}
 close $fh;
-open(my $bigWordlist, '<', "Wordlist 100000 frequency weighted (Google Books).txt") or die "Failed to open file for reading\n";
+# open(my $bigWordlist, '<', "Wordlist 100000 frequency weighted (Google Books).txt") or die "Failed to open file for reading\n";
+open(my $bigWordlist, '<', "english3_gwicks.txt") or die "Failed to open file for reading\n";
 chomp(my @dictionary = <$bigWordlist>);
 close $bigWordlist;
 
@@ -172,22 +173,24 @@ foreach my $word (@orgWordList)
             }   
             #if it is not, then check to see if it's a word in the dictionary and/or a word we've already generated
             if ($foundSpellingAsWord == 0) {
-                foreach my $aRealWord (@dictionary)
-                {
-                    if ($newMissSpelling eq $aRealWord) {
-                        $foundGeneratedWord = 1;
-                        print "found " . $newMissSpelling , "\n";
-                        last;
-                    }
-                }
                 foreach my $aGeneratedWord (@missSpelledWords)
                 {
                     if ($newMissSpelling eq $aGeneratedWord) {
                         $foundGeneratedWord++;
+                        print "found " . $newMissSpelling , " in missSpelledWords\n";
                         last;
                     }
                 }
-                
+                if ($foundGeneratedWord == 0) {
+                    foreach my $aRealWord (@dictionary)
+                    {
+                        if ($newMissSpelling eq $aRealWord) {
+                            $foundGeneratedWord = 1;
+                            print "found " . $newMissSpelling , " in dictionary\n";
+                            last;
+                        }
+                    }
+                }
                 if ($foundGeneratedWord == 0) {
                     print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
                     push(@missSpelledWords, $newMissSpelling);
@@ -248,22 +251,24 @@ foreach my $word (@orgWordList)
                         }
                     }
                     if ($foundSpellingAsWord == 0) {
-                        foreach my $aRealWord (@dictionary)
-                        {
-                            if ($newMissSpelling eq $aRealWord) {
-                                $foundGeneratedWord = 1;
-                                print "found " . $newMissSpelling , "\n";
-                                last;
-                            }
-                        }
                         foreach my $aGeneratedWord (@missSpelledWords)
                         {
                             if ($newMissSpelling eq $aGeneratedWord) {
                                 $foundGeneratedWord++;
+                                print "found " . $newMissSpelling , " in missSpelledWords\n";
                                 last;
                             }
                         }
-                        
+                        if ($foundGeneratedWord == 0) {
+                            foreach my $aRealWord (@dictionary)
+                            {
+                                if ($newMissSpelling eq $aRealWord) {
+                                    $foundGeneratedWord = 1;
+                                    print "found " . $newMissSpelling , " in dictionary\n";
+                                    last;
+                                }
+                            }
+                        }
                         if ($foundGeneratedWord == 0) {
                             print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
                             push(@missSpelledWords, $newMissSpelling);
