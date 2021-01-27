@@ -11,6 +11,7 @@ use warnings;
 my $newMissSpelling;
 my @completedWords;
 my @missSpelledWords;
+my @generatedwords_ahk;
 my $fh;
 
 eval "use Win32::GUI()";
@@ -62,7 +63,8 @@ chomp(my @dictionary = <$bigWordlist>);
 close $bigWordlist;
 
 #open($fh, '<', "wordlist.txt") or die "Failed to open file for reading\n";
-open(my $fh_out, '>', "generatedwords.ahk")    or die "Failed to open file for writing\n";
+#open(my $fh_out, '>', "generatedwords.ahk")    or die "Failed to open file for writing\n";
+open(my $fh_out2, '>', "generatedwords2.ahk")    or die "Failed to open file for writing\n";
 
 #while (my $word = <$fh>)
 my $iterCount = 0;
@@ -192,7 +194,8 @@ foreach my $word (@orgWordList)
                     }
                 }
                 if ($foundGeneratedWord == 0) {
-                    print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
+                    # print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
+                    push(@generatedwords_ahk, "::" . $newMissSpelling . "::" . $word, "\n");
                     push(@missSpelledWords, $newMissSpelling);
                 }
             }
@@ -270,7 +273,8 @@ foreach my $word (@orgWordList)
                             }
                         }
                         if ($foundGeneratedWord == 0) {
-                            print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
+                            # print $fh_out "::" . $newMissSpelling . "::" . $word, "\n";
+                            push(@generatedwords_ahk, "::" . $newMissSpelling . "::" . $word, "\n");
                             push(@missSpelledWords, $newMissSpelling);
                         }
                     }
@@ -337,5 +341,10 @@ foreach my $word (@orgWordList)
     }
 }
 print "------COMPLETED GENERATION!!------\n";
+foreach my $hotkey (@generatedwords_ahk)
+{
+    print $fh_out2 $hotkey;
+}
 close $fh;
-close $fh_out; 
+#close $fh_out; 
+close $fh_out2; 
