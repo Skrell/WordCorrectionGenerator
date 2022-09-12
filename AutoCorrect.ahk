@@ -1,65 +1,12 @@
 #WinActivateForce
 SetBatchLines -1
-SetWinDelay -1
+SetWinDelay   -1
+SetKeyDelay, 0
 SetTitleMatchMode, RegEx
 
-
-global counter   := 1
-BkupArray := Object()
-BkupArray_Skype := Object()
-global firstTime := 1
-global numofmin  := 0
-global WinID     := 0
-global reachedend := 0
-global oldskypecount := 0
-global newskypecount := 0
-
-;SetTimer, StupidSkype, 2000
-; return
-
-StupidSkype:
-newskypecount := 0
-result := false
-WinGet, All, List
-    Loop, % All
-    {
-        WinGetClass, ClassID,  % "ahk_id " All%A_Index%
-        WinGetTitle, TitleID,  % "ahk_id " All%A_Index%
-        
-        if (ClassID = "LyncConversationWindowClass")
-        {
-            newskypecount += 1
-            ;BkupArray_Skype.Push(All%A_Index%)
-        }
-        
-        IfInString, TitleID, Reminder 
-            result := true
-        if ((ClassID = "#32770") and (result))
-        {
-            WinActivate, % "ahk_id " All%A_Index%
-        }
-    }
-    if (newskypecount > oldskypecount)
-    {
-     ;Loop, % BkupArray_Skype.MaxIndex()
-     ;{
-     ;          WinID := BkupArray_Skype.Pop()
-     ;          WinActivate, % "ahk_id " WinID
-     ;}
-     Loop, % All
-     {
-	    WinGetClass, ClassID,  % "ahk_id " All%A_Index%
-        if (ClassID = "LyncConversationWindowClass")
-        {
-            WinActivate, % "ahk_id " All%A_Index%
-        }
-     }
-    }
-oldskypecount := newskypecount 
-return
+Process, Priority,, High
 
 CapsLock:: Send {Delete}
-+!LBUTTON:: Send {LBUTTON}{Enter}
 
 +!i::   SendInput {SHIFT down}{UP}{SHIFT up}
 +!k::   SendInput {SHIFT down}{DOWN}{SHIFT up}
@@ -78,214 +25,37 @@ CapsLock:: Send {Delete}
 !j:: Send {LEFT}
 !l:: Send {RIGHT}
 
-~Esc::	; <-- CLOSE WITH DOUBLE ESCAPE
-    if (A_PriorHotkey <> "~Esc" or A_TimeSincePriorHotkey > 400)
-    {
-        KeyWait, Esc
-        return
-    }
-    MouseGetPos, mousePosX, mousePosY, WindowUnderMouseID
-    WinGetPos, x, y, w, h, ahk_id %WindowUnderMouseID%
-    WinClose , ahk_id %WindowUnderMouseID%
-Return
-
-; !Tab::
-    ; ; ToolTip, 
-    ; WinGet, All, List,
-    ; Allnew      := 1
-    ; if (firstTime=1)
-    ; {
-        ; WinGetClass, CurrentClass, A
-        ; FirstWinClass := CurrentClass
-        ; Loop, % All
-        ; {
-            ; WinGet, State, MinMax, % "ahk_id " All%A_Index%
-            ; ;WinGetClass, ClassID,  % "ahk_id " All%A_Index%
-            ; if (State <> -1) ; and ClassID <> "ApplicationFrameWindow")
-            ; {
-                ; BkupArray.Push(All%A_Index%)
-            ; }
-        ; }
-        ; firstTime := 0
-    ; }
-    ; Loop, % All
-    ; {
-       ; reachedend  := 0
-       ; WinGet, State, MinMax, % "ahk_id " All%A_Index%
-       ; WinGet, Style, Style,  % "ahk_id " All%A_Index%
-       ; WinGetClass, ClassID,  % "ahk_id " All%A_Index%
-       ; WinGetPos, X, Y, Width, Height, % "ahk_id " All%A_Index%
-       
-       ; if ((State <> -1) and (Style & 0x100F0000 = 0x100F0000) and (ClassID <> "") and !(X = 0 and Y = 0) and (Style & 0xF0000000 <> 0x90000000)) ; ) 
-       ; {
-            ; Loop, % Allnew
-            ; {
-                ; WinGetClass, tempID,  % "ahk_id " Allnew%A_Index%
-                ; if (tempID <> ClassID)
-                ; {
-                    ; if (Allnew = A_Index)
-                    ; {
-                        ; reachedend := 1
-                        ; break
-                    ; }
-                    ; else
-                        ; continue    
-                ; }
-                ; else ;if we found a match then the windows ID already exists
-                    ; break
-            ; }
-            ; if (reachedend = 1)
-            ; {
-                ; wincount := Allnew
-                ; Allnew%wincount% := % All%A_Index%
-                ; if (A_Index < All) ; prevent incrementing this 1 last time before exiting the loop
-                    ; Allnew += 1
-            ; }
-       ; }
-    ; }
-    ; Allnew -= 1
-    
-    ; if (counter >= Allnew-1)
-        ; counter := Allnew-1
-        
-    ; Loop, % Allnew
-    ; {
-        ; newIndex  := counter + 1
-        ; WinID_top := Allnew%newIndex%
-    ; }
-    ; WinGet, Style, Style,  % "ahk_id " Allnew%newIndex%
-    ; WinGetClass, ClassID,  % "ahk_id " Allnew%newIndex%
-    ; WinGetPos, X, Y, Width, Height, % "ahk_id " Allnew%newIndex%
-    ; Tooltip  % "Index: " newIndex " Style: " Style " Counter: " counter " WinID: " WinID_top " Total: " Allnew " ID: " ClassID " X " X " Y " Y
-    ; WinActivate, % "ahk_id " WinID_top
-    ; counter += 1
-    ; SetTimer, ResetCounter, 100
-; return
-
-
-!`:: ; Next window
-    ToolTip
-    skip = 1
-    WinGetClass, ActiveClass, A
-    WinGet, List, List, % "ahk_class " ActiveClass
-    WinGet, All, List,
-    if (firstTime=1)
-    {
-        Loop, % All
-        {
-            WinGet, State, MinMax, % "ahk_id " All%A_Index%
-            WinGetClass, ClassID,  % "ahk_id " All%A_Index%
-            if (State <> -1 and ClassID <> "ApplicationFrameWindow")
-            {
-                BkupArray.Push(All%A_Index%)
-            }
-        }
-        firstTime :=0
-    }
-        
-    if (counter >= List-1-(1*numofmin))
-        counter := List-1-(1*numofmin)
-    Loop,  % List
-    {
-        newIndex := counter + 1
-        WinGet, State, MinMax, % "ahk_id " List%newIndex%
-        if (State <> -1)
-        {
-            WinID_top := List%newIndex%
-            ;ToolTip, C:%counter% L:%List% I:%newIndex%
-            counter += 1
-            WinActivate, % "ahk_id " WinID_top
-            break
-        }
-        else
-        {   
-            numofmin += 1
-            WinSet, Bottom,, % "ahk_id " List%newIndex%
-            ToolTip, "MINIMZED WINDOW": C:%counter% L:%List% I:%newIndex% N:%numofmin%
-            counter += 1
-            break
-        }
-    }
-    SetTimer, ResetCounter, 100
-return
-
-ResetCounter:
-    GetKeyState, ALTstate, LAlt
-    GetKeyState, WINstate, LWin
-    if ((ALTstate = "U") and (WINstate = "U"))
-    {
-        ToolTip
-        counter   := 1
-        firstTime := 1
-        numofmin  := 0
-        Loop, % BkupArray.MaxIndex()
-        {
-            WinID := BkupArray.Pop()
-            if (newIndex > 2)
-                WinActivate, % "ahk_id " WinID
-        }
-        WinActivate, % "ahk_id " WinID_top
-        Loop, % List
-        {
-            List%A_Index% := ""
-        }
-        Allnew    := ""
-        WinID_top := ""
-        SetTimer, ResetCounter, off
-    }
-    Loop, % Allnew
-    {
-        Allnew%A_Index% := ""
-    }
-return
-
-
-!^`:: ; Last window
-WinGetClass, ActiveClass, A
-WinGet, List, List, % "ahk_class " ActiveClass
-Loop, % List
-{
-	index := List - A_Index + 1
-	WinGet, State, MinMax, % "ahk_id " List%index%
-	if (State <> -1)
-	{
-		WinID := List%index%
-		break
-	}
-}
-WinActivate, % "ahk_id " WinID
-return
 ;------------------------------------------------------------------------------
 ; CHANGELOG:
-; 
+;
 ; Sep 13 2007: Added more misspellings.
 ;              Added fix for -ign -> -ing that ignores words like "sign".
 ;              Added word beginnings/endings sections to cover more options.
 ;              Added auto-accents sectikse by Jim Biancolo (http://www.biancolo.com)
-; 
+;
 ; INTRODUCTION
-; 
+;
 ; This is an AutoHotKey script that implements AutoCorrect against several
 ; "Lists of common misspellings":
-; 
+;
 ; This does not replace a proper spellchecker such as in Firefox, Word, etc.
 ; It is usually better to have uncertain typos highlighted by a spellchecker
 ; than to "correct" them incorrectly so  that they are no longer even caught by
 ; a spellchecker: it is not the job of an autocorrector to correct *all*
 ; misspellings, but only those which are very obviously incorrect.
-; 
+;
 ; From a suggestion by Tara Gibb, you can add your own corrections to any
 ; highlighted word by hitting Win+H. These will be added to a separate file,
 ; so that you can safely update this file without overwriting your changes.
-; 
+;
 ; Some entries have more than one possible resolution (achive->achieve/archive)
 ; or are clearly a matter of deliberate personal writing style (wanna, colour)
-; 
+;
 ; These have been placed at the end of this file and commented out, so you can
 ; easily edit and add them back in as you like, tailored to your preferences.
-; 
+;
 ; SOURCES
-; 
+;
 ; http://en.wikipedia.org/wiki/Wikipedia:Lists_of_common_misspellings
 ; http://en.wikipedia.org/wiki/Wikipedia:Typo
 ; Microsoft Office autocorrect list
@@ -293,9 +63,9 @@ return
 ; OpenOffice autocorrect list
 ; TextTrust press release
 ; User suggestions.
-; 
+;
 ; CONTENTS
-; 
+;
 ;   Settings
 ;   AUto-COrrect TWo COnsecutive CApitals (commented out by default)
 ;   Win+H code
@@ -312,7 +82,7 @@ return
 ;------------------------------------------------------------------------------
 #NoEnv ; For security
 #SingleInstance force
-#Hotstring EndChars -()[]{}:;/\,.?!`n `t
+;#Hotstring EndChars -()[]{}:;/\,.?!`n `t
 #IfWinNotActive ahk_class PuTTY
 #IfWinNotActive NoMachine
 #IfWinNotActive Notepad++
@@ -336,7 +106,8 @@ Hoty:
         SendInput % "{Left}{BS}+" . SubStr(A_PriorHotKey,3,1) . "{Right}"
 Return
 */
-;#include C:\Users\vbonaven\Desktop\Clipjump\publicAPI.ahk
+
+
 ;------------------------------------------------------------------------------
 ; Win+H to enter misspelling correction.  It will be added to this script.
 ;------------------------------------------------------------------------------
@@ -344,10 +115,7 @@ LWin & h::
 ; Get the selected text. The clipboard is used instead of "ControlGet Selected"
 ; as it works in more editors and word processors, java apps, etc. Save the
 ; current clipboard contents to be restored later.
-cj := new Clipjump()
-cj.blockMonitoring(1)
-sleep 500
-AutoTrim Off  ; Retain any leading and trailing whitespace on the clipboard.
+AutoTrim On  ; Delete any leading and trailing whitespace on the clipboard.  Why would you want this?
 ClipboardOld = %ClipboardAll%
 Clipboard =  ; Must start off blank for detection to work.
 Send ^c
@@ -369,21 +137,15 @@ SetTimer, MoveCaret, 10
 InputBox, Hotstring, New Hotstring, Provide the corrected word on the right side. You can also edit the left side if you wish.`n`nExample entry:`n::teh::the,,,,,,,, ::%Hotstring%::%Hotstring%
 
 if ErrorLevel <> 0  ; The user pressed Cancel.
-{
-    cj.blockMonitoring(0)
     return
-}
 ; Otherwise, add the hotstring and reload the script:
 FileAppend, `n%Hotstring%, %A_ScriptFullPath%  ; Put a `n at the beginning in case file lacks a blank line at its end.
-    cj.blockMonitoring(0)
+; it would be best if it overwrote the string you had highlighted with the replacement you just typed in
 Reload
-Sleep 200 ; If successful, the reload will close this instance during the Sleep, so the line below will never be reached.
+Sleep 3000 ; If successful, the reload will close this instance during the Sleep, so the line below will never be reached.
 MsgBox, 4,, The hotstring just added appears to be improperly formatted.  Would you like to open the script for editing? Note that the bad hotstring is at the bottom of the script.
 IfMsgBox, Yes, Edit
-{
-    cj.blockMonitoring(0)
-    return
-}
+return
 
 MoveCaret:
 IfWinNotActive, New Hotstring
@@ -395,7 +157,7 @@ Loop % StrLen(Hotstring) + 4
 SetTimer, MoveCaret, Off
 return
 
-#Hotstring C R  ; Set the default to be "raw mode" (might not actually be relied upon by anything yet).
+; #Hotstring T C k-1 ; Set the default to be "raw mode" (might not actually be relied upon by anything yet).
 
 
 ;------------------------------------------------------------------------------
@@ -404,12 +166,13 @@ return
 ; From: http://www.morewords.com/e nds-with/gn/
 ;------------------------------------------------------------------------------
 #Hotstring B0  ; Turns off automatic backspacing for the following hotstrings.
+; Can be suffix exceptions, too, but should correct "-aling" without correcting "-align".
 ::align::
 ::antiforeign::
 ::arraign::
 ::assign::
 ::benign::
-::campaign::
+:?:campaign:: ; covers "countercampaign". no such words as -campaing
 ::champaign::
 ::codesign::
 ::coign::
@@ -417,11 +180,12 @@ return
 ::consign::
 ::coreign::
 ::cosign::
-::countercampaign::
+;::countercampaign::
 ::countersign::
 ::deign::
 ::deraign::
 ::design::
+::digidesign:: ; Company name
 ::eloign::
 ::ensign::
 ::feign::
@@ -439,11 +203,12 @@ return
 ::resign::
 ::sign::
 ::sovereign::
+::unalign::
 ::unbenign::
 ::verisign::
 return  ; This makes the above hotstrings do nothing so that they override the ign->ing rule below.
 
-#Hotstring B  ; Turn back on automatic backspacing for all subsequent hotstrings.
+#Hotstring B T C k-1 ; Set the default to be "raw mode" (might not actually be relied upon by anything yet).; Turn back on automatic backspacing for all subsequent hotstrings.
 :?:ign::ing
 
 
@@ -463,7 +228,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 :?:;ve::'ve
 ::sice::since  ; Must precede the following line!
 :?:sice::sive
-:?:t eh:: the
+;:?:t eh:: the   ; converts "but eh" to "bu the"
 :?:t hem:: them
 :?:toin::tion
 :?:iotn::tion
@@ -599,296 +364,296 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ; Accented English words, from, amongst others,
 ; http://en.wikipedia.org/wiki/List_of_English_words_with_diacritics
 ; I have included all the ones compatible with reasonable codepages, and placed
-; those that may often not be accented either from a clash with an unaccented 
+; those that may often not be accented either from a clash with an unaccented
 ; word (resume), or because the unaccented version is now common (cafe).
 ;------------------------------------------------------------------------------
-::aesop::Æsop
-::a bas::à bas
-::a la::à la
-::ancien regime::Ancien Régime
-::angstrom::Ångström
-::angstroms::Ångströms
-::anime::animé
-::animes::animés
-::ao dai::ào dái
-::apertif::apértif
-::apertifs::apértifs
-::applique::appliqué
-::appliques::appliqués
-::apres::après
-::arete::arête
-::attache::attaché
-::attaches::attachés
-::auto-da-fe::auto-da-fé
-::belle epoque::belle époque
-::bete noire::bête noire
-::betise::bêtise
-::Bjorn::Bjørn
-::blase::blasé
-::boite::boîte
-::boutonniere::boutonnière
-::canape::canapé
-::canapes::canapés
-::celebre::célèbre
-::celebres::célèbres
-::chaines::chaînés
-::cinema verite::cinéma vérité
-::cinemas verite::cinémas vérité
-::cinema verites::cinéma vérités
-::champs-elysees::Champs-Élysées
-::charge d'affaires::chargé d'affaires
-::chateau::château
-::chateaux::châteaux
-::chateaus::châteaus
-::cliche::cliché
-::cliched::clichéd
-::cliches::clichés
-::cloisonne::cloisonné
-::consomme::consommé
-::consommes::consommés
-::communique::communiqué
-::communiques::communiqués
-::confrere::confrère
-::confreres::confrères
-::cortege::cortège
-::corteges::cortèges
-::coup d'etat::coup d'état
-::coup d'etats::coup d'états
-::coup de tat::coup d'état
-::coup de tats::coup d'états
-::coup de grace::coup de grâce
-::creche::crèche
-::creches::crèches
-::coulee::coulée
-::coulees::coulées
-::creme brulee::crème brûlée
-::creme brulees::crème brûlées
-::creme caramel::crème caramel
-::creme caramels::crème caramels
-::creme de cacao::crème de cacao
-::creme de menthe::crème de menthe
-::crepe::crêpe
-::crepes::crêpes
-::creusa::Creüsa
-::crouton::croûton
-::croutons::croûtons
-::crudites::crudités
-::curacao::curaçao
-::dais::daïs
-::daises::daïses
-::debacle::débâcle
-::debacles::débâcles
-::debutante::débutante
-::debutants::débutants
-::declasse::déclassé
-::decolletage::décolletage
-::decollete::décolleté
-::decor::décor
-::decors::décors
-::decoupage::découpage
-::degage::dégagé
-::deja vu::déjà vu
-::demode::démodé
-::denoument::dénoument
-::derailleur::dérailleur
-::derriere::derrière
-::deshabille::déshabillé
-::detente::détente
-::diamante::diamanté
-::discotheque::discothèque
-::discotheques::discothèques
-::divorcee::divorcée
-::divorcees::divorcées
-::doppelganger::doppelgänger
-::doppelgangers::doppelgängers
-::eclair::éclair
-::eclairs::éclairs
-::eclat::éclat
-::el nino::El Niño
-::elan::élan
-::emigre::émigré
-::emigres::émigrés
-::entree::entrée
-::entrees::entrées
-::entrepot::entrepôt
-::entrecote::entrecôte
-::epee::épée
-::epees::épées
-::etouffee::étouffée
-::facade::façade
-::facades::façades
-::fete::fête
-::fetes::fêtes
-::faience::faïence
-::fiance::fiancé
-::fiances::fiancés
-::fiancee::fiancée
-::fiancees::fiancées
-::filmjolk::filmjölk
-::fin de siecle::fin de siècle
-::flambe::flambé
-::flambes::flambés
-::fleche::flèche
-::Fohn wind::Föhn wind
-::folie a deux::folie à deux
-::folies a deux::folies à deux
-::fouette::fouetté
-::frappe::frappé
-::frappes::frappés
-:?*:fraulein::fräulein
-:?*:fuhrer::Führer
-::garcon::garçon
-::garcons::garçons
-::gateau::gâteau
-::gateaus::gâteaus
-::gateaux::gâteaux
-::gemutlichkeit::gemütlichkeit
-::glace::glacé
-::glogg::glögg
-::gewurztraminer::Gewürztraminer
-::gotterdammerung::Götterdämmerung
-::grafenberg spot::Gräfenberg spot
-::habitue::habitué
-::ingenue::ingénue
-::jager::jäger
-::jalapeno::jalapeño
-::jalapenos::jalapeños
-::jardiniere::jardinière
-::krouzek::kroužek
-::kummel::kümmel
-::kaldolmar::kåldolmar
-::landler::ländler
-::langue d'oil::langue d'oïl
-::la nina::La Niña
-::litterateur::littérateur
-::lycee::lycée
-::macedoine::macédoine
-::macrame::macramé
-::maitre d'hotel::maître d'hôtel
-::malaguena::malagueña
-::manana::mañana
-::manege::manège
-::manque::manqué
-::materiel::matériel
-::matinee::matinée
-::matinees::matinées
-::melange::mélange
-::melee::mêlée
-::melees::mêlées
-::menage a trois::ménage à trois
-::menages a trois::ménages à trois
-::mesalliance::mésalliance
-::metier::métier
-::minaudiere::minaudière
-::mobius strip::Möbius strip
-::mobius strips::Möbius strips
-::moire::moiré
-::moireing::moiréing
-::moires::moirés
-::motley crue::Mötley Crüe
-::motorhead::Motörhead
-::naif::naïf
-::naifs::naïfs
-::naive::naïve
-::naiver::naïver
-::naives::naïves
-::naivete::naïveté
-::nee::née
-::negligee::negligée
-::negligees::negligées
-::neufchatel cheese::Neufchâtel cheese
-::nez perce::Nez Percé
-::noël::Noël
-::noëls::Noëls
-::número uno::número uno
-::objet trouve::objet trouvé
-::objets trouve::objets trouvé
-::ombre::ombré
-::ombres::ombrés
-::omerta::omertà
-::opera bouffe::opéra bouffe
-::operas bouffe::opéras bouffe
-::opera comique::opéra comique
-::operas comique::opéras comique
-::outre::outré
-::papier-mache::papier-mâché
-::passe::passé
-::piece de resistance::pièce de résistance
-::pied-a-terre::pied-à-terre
-::plisse::plissé
-::pina colada::Piña Colada
-::pina coladas::Piña Coladas
-::pinata::piñata
-::pinatas::piñatas
-::pinon::piñon
-::pinons::piñons
-::pirana::piraña
-::pique::piqué
-::piqued::piquéd
-::più::più
-::plie::plié
-::precis::précis
-::polsa::pölsa
-::pret-a-porter::prêt-à-porter
-::protoge::protégé
-::protege::protégé
-::proteged::protégéd
-::proteges::protégés
-::protegee::protégée
-::protegees::protégées
-::protegeed::protégéed
-::puree::purée
-::pureed::puréed
-::purees::purées
-::Quebecois::Québécois
-::raison d'etre::raison d'être
-::recherche::recherché
-::reclame::réclame
-::résume::résumé
-::resumé::résumé
-::résumes::résumés
-::resumés::résumés
-::retrousse::retroussé
-::risque::risqué
-::riviere::rivière
-::roman a clef::roman à clef
-::roue::roué
-::saute::sauté
-::sauted::sautéd
-::seance::séance
-::seances::séances
-::senor::señor
-::senors::señors
-::senora::señora
-::senoras::señoras
-::senorita::señorita
-::senoritas::señoritas
-::sinn fein::Sinn Féin
-::smorgasbord::smörgåsbord
-::smorgasbords::smörgåsbords
-::smorgastarta::smörgåstårta
-::soigne::soigné
-::soiree::soirée
-::soireed::soiréed
-::soirees::soirées
-::souffle::soufflé
-::souffles::soufflés
-::soupcon::soupçon
-::soupcons::soupçons
-::surstromming::surströmming
-::tete-a-tete::tête-à-tête
-::tete-a-tetes::tête-à-têtes
-::touche::touché
-::tourtiere::tourtière
-::ubermensch::Übermensch
-::ubermensches::Übermensches
-::ventre a terre::ventre à terre
-::vicuna::vicuña
-::vin rose::vin rosé
-::vins rose::vins rosé
-::vis a vis::vis à vis
-::vis-a-vis::vis-à-vis
-::voila::voilà 
+::aesop::Ã†sop
+::a bas::Ã  bas
+::a la::Ã  la
+::ancien regime::Ancien RÃ©gime
+::angstrom::Ã…ngstrÃ¶m
+::angstroms::Ã…ngstrÃ¶ms
+::anime::animÃ©
+::animes::animÃ©s
+::ao dai::Ã o dÃ¡i
+::apertif::apÃ©rtif
+::apertifs::apÃ©rtifs
+::applique::appliquÃ©
+::appliques::appliquÃ©s
+::apres::aprÃ¨s
+::arete::arÃªte
+::attache::attachÃ©
+::attaches::attachÃ©s
+::auto-da-fe::auto-da-fÃ©
+::belle epoque::belle Ã©poque
+::bete noire::bÃªte noire
+::betise::bÃªtise
+::Bjorn::BjÃ¸rn
+::blase::blasÃ©
+::boite::boÃ®te
+::boutonniere::boutonniÃ¨re
+::canape::canapÃ©
+::canapes::canapÃ©s
+::celebre::cÃ©lÃ¨bre
+::celebres::cÃ©lÃ¨bres
+::chaines::chaÃ®nÃ©s
+::cinema verite::cinÃ©ma vÃ©ritÃ©
+::cinemas verite::cinÃ©mas vÃ©ritÃ©
+::cinema verites::cinÃ©ma vÃ©ritÃ©s
+::champs-elysees::Champs-Ã‰lysÃ©es
+::charge d'affaires::chargÃ© d'affaires
+::chateau::chÃ¢teau
+::chateaux::chÃ¢teaux
+::chateaus::chÃ¢teaus
+::cliche::clichÃ©
+::cliched::clichÃ©d
+::cliches::clichÃ©s
+::cloisonne::cloisonnÃ©
+::consomme::consommÃ©
+::consommes::consommÃ©s
+::communique::communiquÃ©
+::communiques::communiquÃ©s
+::confrere::confrÃ¨re
+::confreres::confrÃ¨res
+::cortege::cortÃ¨ge
+::corteges::cortÃ¨ges
+::coup d'etat::coup d'Ã©tat
+::coup d'etats::coup d'Ã©tats
+::coup de tat::coup d'Ã©tat
+::coup de tats::coup d'Ã©tats
+::coup de grace::coup de grÃ¢ce
+::creche::crÃ¨che
+::creches::crÃ¨ches
+::coulee::coulÃ©e
+::coulees::coulÃ©es
+::creme brulee::crÃ¨me brÃ»lÃ©e
+::creme brulees::crÃ¨me brÃ»lÃ©es
+::creme caramel::crÃ¨me caramel
+::creme caramels::crÃ¨me caramels
+::creme de cacao::crÃ¨me de cacao
+::creme de menthe::crÃ¨me de menthe
+::crepe::crÃªpe
+::crepes::crÃªpes
+::creusa::CreÃ¼sa
+::crouton::croÃ»ton
+::croutons::croÃ»tons
+::crudites::cruditÃ©s
+::curacao::curaÃ§ao
+::dais::daÃ¯s
+::daises::daÃ¯ses
+::debacle::dÃ©bÃ¢cle
+::debacles::dÃ©bÃ¢cles
+::debutante::dÃ©butante
+::debutants::dÃ©butants
+::declasse::dÃ©classÃ©
+::decolletage::dÃ©colletage
+::decollete::dÃ©colletÃ©
+::decor::dÃ©cor
+::decors::dÃ©cors
+::decoupage::dÃ©coupage
+::degage::dÃ©gagÃ©
+::deja vu::dÃ©jÃ  vu
+::demode::dÃ©modÃ©
+::denoument::dÃ©noument
+::derailleur::dÃ©railleur
+::derriere::derriÃ¨re
+::deshabille::dÃ©shabillÃ©
+::detente::dÃ©tente
+::diamante::diamantÃ©
+::discotheque::discothÃ¨que
+::discotheques::discothÃ¨ques
+::divorcee::divorcÃ©e
+::divorcees::divorcÃ©es
+::doppelganger::doppelgÃ¤nger
+::doppelgangers::doppelgÃ¤ngers
+::eclair::Ã©clair
+::eclairs::Ã©clairs
+::eclat::Ã©clat
+::el nino::El NiÃ±o
+::elan::Ã©lan
+::emigre::Ã©migrÃ©
+::emigres::Ã©migrÃ©s
+::entree::entrÃ©e
+::entrees::entrÃ©es
+::entrepot::entrepÃ´t
+::entrecote::entrecÃ´te
+::epee::Ã©pÃ©e
+::epees::Ã©pÃ©es
+::etouffee::Ã©touffÃ©e
+::facade::faÃ§ade
+::facades::faÃ§ades
+::fete::fÃªte
+::fetes::fÃªtes
+::faience::faÃ¯ence
+::fiance::fiancÃ©
+::fiances::fiancÃ©s
+::fiancee::fiancÃ©e
+::fiancees::fiancÃ©es
+::filmjolk::filmjÃ¶lk
+::fin de siecle::fin de siÃ¨cle
+::flambe::flambÃ©
+::flambes::flambÃ©s
+::fleche::flÃ¨che
+::Fohn wind::FÃ¶hn wind
+::folie a deux::folie Ã  deux
+::folies a deux::folies Ã  deux
+::fouette::fouettÃ©
+::frappe::frappÃ©
+::frappes::frappÃ©s
+:?*:fraulein::frÃ¤ulein
+:?*:fuhrer::FÃ¼hrer
+::garcon::garÃ§on
+::garcons::garÃ§ons
+::gateau::gÃ¢teau
+::gateaus::gÃ¢teaus
+::gateaux::gÃ¢teaux
+::gemutlichkeit::gemÃ¼tlichkeit
+::glace::glacÃ©
+::glogg::glÃ¶gg
+::gewurztraminer::GewÃ¼rztraminer
+::gotterdammerung::GÃ¶tterdÃ¤mmerung
+::grafenberg spot::GrÃ¤fenberg spot
+::habitue::habituÃ©
+::ingenue::ingÃ©nue
+::jager::jÃ¤ger
+::jalapeno::jalapeÃ±o
+::jalapenos::jalapeÃ±os
+::jardiniere::jardiniÃ¨re
+::krouzek::krouÅ¾ek
+::kummel::kÃ¼mmel
+::kaldolmar::kÃ¥ldolmar
+::landler::lÃ¤ndler
+::langue d'oil::langue d'oÃ¯l
+::la nina::La NiÃ±a
+::litterateur::littÃ©rateur
+::lycee::lycÃ©e
+::macedoine::macÃ©doine
+::macrame::macramÃ©
+::maitre d'hotel::maÃ®tre d'hÃ´tel
+::malaguena::malagueÃ±a
+::manana::maÃ±ana
+::manege::manÃ¨ge
+::manque::manquÃ©
+::materiel::matÃ©riel
+::matinee::matinÃ©e
+::matinees::matinÃ©es
+::melange::mÃ©lange
+::melee::mÃªlÃ©e
+::melees::mÃªlÃ©es
+::menage a trois::mÃ©nage Ã  trois
+::menages a trois::mÃ©nages Ã  trois
+::mesalliance::mÃ©salliance
+::metier::mÃ©tier
+::minaudiere::minaudiÃ¨re
+::mobius strip::MÃ¶bius strip
+::mobius strips::MÃ¶bius strips
+::moire::moirÃ©
+::moireing::moirÃ©ing
+::moires::moirÃ©s
+::motley crue::MÃ¶tley CrÃ¼e
+::motorhead::MotÃ¶rhead
+::naif::naÃ¯f
+::naifs::naÃ¯fs
+::naive::naÃ¯ve
+::naiver::naÃ¯ver
+::naives::naÃ¯ves
+::naivete::naÃ¯vetÃ©
+; ::nee::nÃ©e ; mistyping things like "I nee da" is more common.
+::negligee::negligÃ©e
+::negligees::negligÃ©es
+::neufchatel cheese::NeufchÃ¢tel cheese
+::nez perce::Nez PercÃ©
+::noÃ«l::NoÃ«l
+::noÃ«ls::NoÃ«ls
+::nÃºmero uno::nÃºmero uno
+::objet trouve::objet trouvÃ©
+::objets trouve::objets trouvÃ©
+::ombre::ombrÃ©
+::ombres::ombrÃ©s
+::omerta::omertÃ 
+::opera bouffe::opÃ©ra bouffe
+::operas bouffe::opÃ©ras bouffe
+::opera comique::opÃ©ra comique
+::operas comique::opÃ©ras comique
+::outre::outrÃ©
+::papier-mache::papier-mÃ¢chÃ©
+::passe::passÃ©
+::piece de resistance::piÃ¨ce de rÃ©sistance
+::pied-a-terre::pied-Ã -terre
+::plisse::plissÃ©
+::pina colada::PiÃ±a Colada
+::pina coladas::PiÃ±a Coladas
+::pinata::piÃ±ata
+::pinatas::piÃ±atas
+::pinon::piÃ±on
+::pinons::piÃ±ons
+::pirana::piraÃ±a
+::pique::piquÃ©
+::piqued::piquÃ©d
+::piÃ¹::piÃ¹
+::plie::pliÃ©
+::precis::prÃ©cis
+::polsa::pÃ¶lsa
+::pret-a-porter::prÃªt-Ã -porter
+::protoge::protÃ©gÃ©
+::protege::protÃ©gÃ©
+::proteged::protÃ©gÃ©d
+::proteges::protÃ©gÃ©s
+::protegee::protÃ©gÃ©e
+::protegees::protÃ©gÃ©es
+::protegeed::protÃ©gÃ©ed
+::puree::purÃ©e
+::pureed::purÃ©ed
+::purees::purÃ©es
+::Quebecois::QuÃ©bÃ©cois
+::raison d'etre::raison d'Ãªtre
+::recherche::recherchÃ©
+::reclame::rÃ©clame
+::rÃ©sume::rÃ©sumÃ©
+::resumÃ©::rÃ©sumÃ©
+::rÃ©sumes::rÃ©sumÃ©s
+::resumÃ©s::rÃ©sumÃ©s
+::retrousse::retroussÃ©
+::risque::risquÃ©
+::riviere::riviÃ¨re
+::roman a clef::roman Ã  clef
+::roue::rouÃ©
+::saute::sautÃ©
+::sauted::sautÃ©d
+::seance::sÃ©ance
+::seances::sÃ©ances
+::senor::seÃ±or
+::senors::seÃ±ors
+::senora::seÃ±ora
+::senoras::seÃ±oras
+::senorita::seÃ±orita
+::senoritas::seÃ±oritas
+::sinn fein::Sinn FÃ©in
+::smorgasbord::smÃ¶rgÃ¥sbord
+::smorgasbords::smÃ¶rgÃ¥sbords
+::smorgastarta::smÃ¶rgÃ¥stÃ¥rta
+::soigne::soignÃ©
+::soiree::soirÃ©e
+::soireed::soirÃ©ed
+::soirees::soirÃ©es
+::souffle::soufflÃ©
+::souffles::soufflÃ©s
+::soupcon::soupÃ§on
+::soupcons::soupÃ§ons
+::surstromming::surstrÃ¶mming
+::tete-a-tete::tÃªte-Ã -tÃªte
+::tete-a-tetes::tÃªte-Ã -tÃªtes
+::touche::touchÃ©
+::tourtiere::tourtiÃ¨re
+::ubermensch::Ãœbermensch
+::ubermensches::Ãœbermensches
+::ventre a terre::ventre Ã  terre
+::vicuna::vicuÃ±a
+::vin rose::vin rosÃ©
+::vins rose::vins rosÃ©
+::vis a vis::vis Ã  vis
+::vis-a-vis::vis-Ã -vis
+::voila::voilÃ 
 
 ;------------------------------------------------------------------------------
 ; Common Misspellings - the main list
@@ -901,18 +666,25 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::avengence::a vengeance
 ::adbandon::abandon
 ::abandonned::abandoned
+::abbreviatoin::abbreviation
 ::aberation::aberration
 ::aborigene::aborigine
 ::abortificant::abortifacient
 ::abbout::about
+::abot::about
 ::abotu::about
+::abuot::about
+::aobut::about
 ::baout::about
+::bouat::about
 ::abouta::about a
+::abou tit::about it
 ::aboutit::about it
 ::aboutthe::about the
 ::abscence::absence
 ::absense::absence
 ::abcense::absense
+::absolutley::absolutely
 ::absolutly::absolutely
 ::asorbed::absorbed
 ::absorbsion::absorption
@@ -927,7 +699,9 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::acadamy::academy
 ::accademy::academy
 ::accelleration::acceleration
+::acceotable::acceptable
 ::acceptible::acceptable
+::accetpable::acceptable
 ::acceptence::acceptance
 ::accessable::accessible
 ::accension::accession
@@ -936,6 +710,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::accidant::accident
 ::accidentaly::accidentally
 ::accidently::accidentally
+::accidnetally::accidentally
 ::acclimitization::acclimatization
 ::accomdate::accommodate
 ::accomodate::accommodate
@@ -949,14 +724,17 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::accompanyed::accompanied
 ::acomplish::accomplish
 ::acomplished::accomplished
+::accomplishemnt::accomplishment
 ::acomplishment::accomplishment
 ::acomplishments::accomplishments
+::accoding::according
 ::accoring::according
 ::acording::according
 ::accordingto::according to
 ::acordingly::accordingly
 ::accordeon::accordion
 ::accordian::accordion
+::acconut::account
 ::acocunt::account
 ::acuracy::accuracy
 ::acccused::accused
@@ -967,6 +745,8 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::achive::achieve
 ::achivement::achievement
 ::achivements::achievements
+::acide::acid
+::acknolwedge::acknowledge
 ::acknowldeged::acknowledged
 ::acknowledgeing::acknowledging
 ::accoustic::acoustic
@@ -985,10 +765,16 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::accross::across
 ::activly::actively
 ::activites::activities
+::actaully::actually
 ::actualy::actually
 ::actualyl::actually
+::acutally::actually
+::acutaly::actually
+::acutlaly::actually
+::atually::actually
 ::adaption::adaptation
 ::adaptions::adaptations
+::addng::adding
 ::addtion::addition
 ::additinal::additional
 ::addtional::additional
@@ -1009,6 +795,11 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::adequite::adequate
 ::adherance::adherence
 ::adhearing::adhering
+::adjusmenet::adjustment
+::adjusment::adjustment
+::adjustement::adjustment
+::adjustemnet::adjustment
+::adjustmenet::adjustment
 ::adminstered::administered
 ::adminstrate::administrate
 ::adminstration::administration
@@ -1047,7 +838,10 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::afficionados::aficionados
 ::aforememtioned::aforementioned
 ::affraid::afraid
+::afradi::afraid
+::afriad::afraid
 ::afterthe::after the
+::agani::again
 ::agian::again
 ::agin::again
 ::againnst::against
@@ -1078,6 +872,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::agreemeents::agreements
 ::agreemnets::agreements
 ::agricuture::agriculture
+::aheda::ahead
 ::airbourne::airborne
 ::aicraft::aircraft
 ::aircaft::aircraft
@@ -1098,6 +893,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::algorhitms::algorithms
 ::algoritms::algorithms
 ::alientating::alienating
+::all the itme::all the time
 ::alltime::all-time
 ::aledge::allege
 ::alege::allege
@@ -1129,21 +925,30 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::alraedy::already
 ::alreayd::already
 ::alreday::already
+::alredy::already
 ::aready::already
+::alrigth::alright
+::alriht::alright
 ::alsation::Alsatian
+::alos::also
 ::alsot::also
 ::aslo::also
+::laternative::alternative
 ::alternitives::alternatives
 ::allthough::although
 ::altho::although
 ::althought::although
 ::altough::although
+::altogehter::altogether
 ::allwasy::always
 ::allwyas::always
 ::alwasy::always
 ::alwats::always
 ::alway::always
+::alwayus::always
 ::alwyas::always
+::awlays::always
+::a mnot::am not
 ::amalgomated::amalgamated
 ::amatuer::amateur
 ::amerliorate::ameliorate
@@ -1157,6 +962,15 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::amung::among
 ::amoungst::amongst
 ::ammount::amount
+::amonut::amount
+::amoutn::amount
+::amplfieir::amplifier
+::amplfiier::amplifier
+::ampliotude::amplitude
+::amploitude::amplitude
+::amplotude::amplitude
+::amplotuide::amplitude
+::amploitudes::amplitudes
 ::ammused::amused
 ::analagous::analogous
 ::analogeous::analogous
@@ -1169,6 +983,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::adn::and
 ::anbd::and
 ::anmd::and
+::an dgot::and got
 ::andone::and one
 ::andt he::and the
 ::andteh::and the
@@ -1179,6 +994,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::aniversary::anniversary
 ::annouced::announced
 ::anounced::announced
+::announcemnt::announcement
 ::anual::annual
 ::annualy::annually
 ::annuled::annulled
@@ -1194,17 +1010,34 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::anohter::another
 ::anotehr::another
 ::anothe::another
+::ansewr::answer
 ::anwsered::answered
+::naswered::answered
 ::antartic::antarctic
 ::anthromorphisation::anthropomorphisation
 ::anthromorphization::anthropomorphization
 ::anti-semetic::anti-Semitic
+::anticlimatic::anticlimactic
 ::anyother::any other
+::anuthing::anything
+::anyhting::anything
+::anythihng::anything
+::anytihng::anything
+::anyting::anything
 ::anytying::anything
+::naything::anything
+::anwyay::anyway
+::anywya::anyway
+::nayway::anyway
+::naywya::anyway
 ::anyhwere::anywhere
 ::appart::apart
 ::aparment::apartment
+::aparmtent::apartment
+::aparmtnet::apartment
+::apartmnet::apartment
 ::appartment::apartment
+::apartmetns::apartments
 ::appartments::apartments
 ::apenines::Apennines
 ::appenines::Apennines
@@ -1215,6 +1048,9 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::apparant::apparent
 ::apparrent::apparent
 ::apparantly::apparently
+::apparnelty::apparently
+::apparnetly::apparently
+::apparntely::apparently
 ::appealling::appealing
 ::appeareance::appearance
 ::appearence::appearance
@@ -1227,6 +1063,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::applicaiton::application
 ::applicaitons::applications
 ::aplied::applied
+::appluied::applied
 ::applyed::applied
 ::appointiment::appointment
 ::apprieciate::appreciate
@@ -1238,6 +1075,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::approrpiate::appropriate
 ::approrpriate::appropriate
 ::apropriate::appropriate
+::approvla::approval
 ::approproximate::approximate
 ::aproximate::approximate
 ::approxamately::approximately
@@ -1260,21 +1098,29 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::architechtures::architectures
 ::arn't::aren't
 ::argubly::arguably
+::arguements::arguments
+::argumetns::arguments
 ::armamant::armament
 ::armistace::armistice
 ::arised::arose
 ::arond::around
+::aronud::around
 ::aroud::around
 ::arround::around
 ::arund::around
+::around ot::around to
 ::aranged::arranged
 ::arangement::arrangement
+::arragnemetn::arrangement
+::arragnemnet::arrangement
+::arrangemetn::arrangement
 ::arrangment::arrangement
 ::arrangments::arrangements
 ::arival::arrival
 ::artical::article
 ::artice::article
 ::articel::article
+::artilce::article
 ::artifical::artificial
 ::artifically::artificially
 ::artillary::artillery
@@ -1284,6 +1130,8 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::aisian::Asian
 ::asside::aside
 ::askt he::ask the
+::asknig::asking
+::alseep::asleep
 ::asphyxation::asphyxiation
 ::assisnate::assassinate
 ::assassintation::assassination
@@ -1304,6 +1152,8 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::assocation::association
 ::asume::assume
 ::asteriod::asteroid
+::asychronous::asynchronous
+::a tthat::at that
 ::atthe::at the
 ::athiesm::atheism
 ::athiest::atheist
@@ -1313,6 +1163,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::atmospher::atmosphere
 ::attrocities::atrocities
 ::attatch::attach
+::attahed::attached
 ::atain::attain
 ::attemp::attempt
 ::attemt::attempt
@@ -1357,6 +1208,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::auxillary::auxiliary
 ::auxilliary::auxiliary
 ::availablility::availability
+::avaiable::available
 ::availaible::available
 ::availalbe::available
 ::availble::available
@@ -1364,13 +1216,19 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::availible::available
 ::avalable::available
 ::avaliable::available
+::avialable::available
 ::avilable::available
+::vaialable::available
 ::avalance::avalanche
 ::averageed::averaged
 ::avation::aviation
 ::awared::awarded
 ::awya::away
 ::aywa::away
+::aweomse::awesome
+::aweosme::awesome
+::awesomoe::awesome
+::aziumth::azimuth
 ::abck::back
 ::bakc::back
 ::bcak::back
@@ -1378,29 +1236,43 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::backrounds::backgrounds
 ::balence::balance
 ::ballance::balance
+::balacned::balanced
 ::banannas::bananas
 ::bandwith::bandwidth
 ::bankrupcy::bankruptcy
 ::banruptcy::bankruptcy
 ::barbeque::barbecue
+::barcod::barcode
 ::basicaly::basically
+::basiclaly::basically
 ::basicly::basically
+::batteryes::batteries
+::batery::battery
 ::cattleship::battleship
 ::bve::be
-::eb::be
+:c:eb::be ; EB is legit?
 ::beachead::beachhead
 ::beatiful::beautiful
 ::beautyfull::beautiful
 ::beutiful::beautiful
 ::becamae::became
 ::baceause::because
+::bcause::because
+::bceause::because
+::bceayuse::because
+::beacues::because
 ::beacuse::because
 ::becasue::because
+::becaues::because
 ::becaus::because
+::becayse::because
 ::beccause::because
+::beceause::because
 ::becouse::because
 ::becuase::because
 ::becuse::because
+::ebcause::because
+::ebceause::because
 ::becausea::because a
 ::becauseof::because of
 ::becausethe::because the
@@ -1410,6 +1282,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::becomming::becoming
 ::bedore::before
 ::befoer::before
+::ebfore::before
 ::begginer::beginner
 ::begginers::beginners
 ::beggining::beginning
@@ -1420,6 +1293,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::beggins::begins
 ::behavour::behaviour
 ::beng::being
+::benig::being
 ::beleagured::beleaguered
 ::beligum::belgium
 ::beleif::belief
@@ -1445,9 +1319,11 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::beseiged::besieged
 ::beseiging::besieging
 ::beastiality::bestiality
+::beter::better
 ::betweeen::between
 ::betwen::between
 ::bewteen::between
+::bweteen::between
 ::inbetween::between
 ::vetween::between
 ::bicep::biceps
@@ -1463,16 +1339,22 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::bombardement::bombardment
 ::bombarment::bombardment
 ::bonnano::Bonanno
+::bootlaoder::bootloader
+::bototm::bottom
+::bougth::bought
 ::bondary::boundary
 ::boundry::boundary
 ::boxs::boxes
+::boyfriedn::boyfriend
 ::brasillian::Brazilian
+::breka::break
 ::breakthough::breakthrough
 ::breakthroughts::breakthroughs
 ::brethen::brethren
 ::bretheren::brethren
 ::breif::brief
 ::breifly::briefly
+::brigthness::brightness
 ::briliant::brilliant
 ::brillant::brilliant
 ::brimestone::brimstone
@@ -1482,14 +1364,19 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::brodcast::broadcast
 ::broadacasting::broadcasting
 ::broady::broadly
+::brocolli::broccoli
 ::borke::broke
+::borther::brother
+::broguht::brought
 ::buddah::Buddha
+::buiding::building
 ::bouy::buoy
 ::bouyancy::buoyancy
 ::buoancy::buoyancy
 ::bouyant::buoyant
 ::boyant::buoyant
 ::beaurocracy::bureaucracy
+::bureacracy::bureaucracy
 ::beaurocratic::bureaucratic
 ::burried::buried
 ::buisness::business
@@ -1497,37 +1384,54 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::bussiness::business
 ::busineses::businesses
 ::buisnessman::businessman
+::buit::but
+::ubt::but
+::ut::but
 ::butthe::but the
+::buynig::buying
 ::byt he::by the
+::caeser::caesar
 ::ceasar::Caesar
+::caffeien::caffeine
 ::casion::caisson
+::calcluate::calculate
 ::caluclate::calculate
 ::caluculate::calculate
 ::calulate::calculate
+::claculate::calculate
 ::calcullated::calculated
 ::caluclated::calculated
 ::caluculated::calculated
 ::calulated::calculated
+::claculated::calculated
+::calcuation::calculation
+::claculation::calculation
+::claculations::calculations
 ::calculs::calculus
 ::calander::calendar
+::calednar::calendar
 ::calenders::calendars
 ::califronia::California
 ::califronian::Californian
 ::caligraphy::calligraphy
+::calilng::calling
 ::callipigian::callipygian
 ::cambrige::Cambridge
+::cmae::came
 ::camoflage::camouflage
 ::campain::campaign
 ::campains::campaigns
 ::acn::can
 ::cna::can
 ::cxan::can
-::can't of::can't have
+::cancle::cancel
 ::candadate::candidate
 ::candiate::candidate
 ::candidiate::candidate
 ::candidtae::candidate
 ::candidtaes::candidates
+::candidtes::candidates
+::canidtes::candidates
 ::cannister::canister
 ::cannisters::canisters
 ::cannnot::cannot
@@ -1535,11 +1439,18 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::cantalope::cantaloupe
 ::caperbility::capability
 ::capible::capable
+::capacitro::capacitor
+::cpacitor::capacitor
+::capcaitors::capacitors
 ::capetown::Cape Town
 ::captial::capital
 ::captued::captured
 ::capturd::captured
 ::carcas::carcass
+::cardiod::cardioid
+::cardiodi::cardioid
+::cardoid::cardioid
+::caridoid::cardioid
 ::carreer::career
 ::carrers::careers
 ::carefull::careful
@@ -1568,6 +1479,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::catholocism::catholicism
 ::caucasion::Caucasian
 ::cacuses::caucuses
+::causeing::causing
 ::cieling::ceiling
 ::cellpading::cellpadding
 ::celcius::Celsius
@@ -1594,12 +1506,22 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::challanges::challenges
 ::chalenging::challenging
 ::champange::champagne
+::chcance::chance
 ::chaneg::change
 ::chnage::change
+::hcange::change
 ::changable::changeable
+::chagned::changed
+::chnaged::changed
 ::chanegs::changes
 ::changeing::changing
+::changin::changing
 ::changng::changing
+::cahnnel::channel
+::chanenl::channel
+::channle::channel
+::hcannel::channel
+::chanenls::channels
 ::caharcter::character
 ::carachter::character
 ::charachter::character
@@ -1616,14 +1538,18 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::cahracters::characters
 ::charachters::characters
 ::charactors::characters
+::hcarge::charge
+::chargig::charging
 ::carismatic::charismatic
 ::charasmatic::charismatic
 ::chartiable::charitable
 ::caht::chat
+::chcek::check
 ::chekc::check
 ::chemcial::chemical
 ::chemcially::chemically
 ::chemicaly::chemically
+::checmicals::chemicals
 ::chemestry::chemistry
 ::cheif::chief
 ::childbird::childbirth
@@ -1631,7 +1557,10 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::childrens::children's
 ::chilli::chili
 ::choosen::chosen
+::chrisitan::Christian
+::chruch::church
 ::chuch::church
+::churhc::church
 ::curch::church
 ::churchs::churches
 ::cincinatti::Cincinnati
@@ -1641,7 +1570,9 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::curcuit::circuit
 ::circulaton::circulation
 ::circumsicion::circumcision
+::circumfrence::circumference
 ::sercumstances::circumstances
+::citaion::citation
 ::cirtus::citrus
 ::civillian::civilian
 ::claimes::claims
@@ -1654,11 +1585,16 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::claered::cleared
 ::claerer::clearer
 ::claerly::clearly
+::clikc::click
 ::cliant::client
 ::clincial::clinical
 ::clinicaly::clinically
+::clipipng::clipping
+::clippin::clipping
+::closeing::closing
 ::caost::coast
 ::coctail::cocktail
+::ocde::code
 ::cognizent::cognizant
 ::co-incided::coincided
 ::coincedentally::coincidentally
@@ -1682,9 +1618,11 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::combanations::combinations
 ::combinatins::combinations
 ::combusion::combustion
+::ocme::come
 ::comback::comeback
 ::commedic::comedic
 ::confortable::comfortable
+::comeing::coming
 ::comming::coming
 ::commadn::command
 ::comander::commander
@@ -1729,6 +1667,8 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::commongly::commonly
 ::commonweath::commonwealth
 ::comunicate::communicate
+::commiunicating::communicating
+::communiucating::communicating
 ::comminication::communication
 ::communciation::communication
 ::communiation::communication
@@ -1744,16 +1684,19 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::company;s::company's
 ::comparitive::comparative
 ::comparitively::comparatively
+::comapre::compare
 ::compair::compare
 ::comparision::comparison
 ::comparisions::comparisons
 ::compability::compatibility
 ::compatiable::compatible
+::compatioble::compatible
 ::compensantion::compensation
 ::competance::competence
 ::competant::competent
 ::compitent::competent
 ::competitiion::competition
+::competitoin::competition
 ::compeitions::competitions
 ::competative::competitive
 ::competive::competitive
@@ -1765,20 +1708,31 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::competely::completely
 ::compleatly::completely
 ::completelyl::completely
+::completley::completely
 ::completly::completely
 ::compleatness::completeness
 ::completness::completeness
 ::completetion::completion
+::ocmplex::complex
+::xomplex::complex
+::comopnent::component
 ::componant::component
+::comopnents::components
 ::composate::composite
 ::comphrehensive::comprehensive
 ::comprimise::compromise
 ::compulsary::compulsory
 ::compulsery::compulsory
 ::cmoputer::computer
+::comptuer::computer
+::compuer::computer
+::copmuter::computer
 ::coputer::computer
+::ocmputer::computer
 ::computarised::computerised
 ::computarized::computerized
+::comptuers::computers
+::ocmputers::computers
 ::concieted::conceited
 ::concieve::conceive
 ::concieved::conceived
@@ -1792,24 +1746,36 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::comdemnation::condemnation
 ::condamned::condemned
 ::condemmed::condemned
+::condensor::condenser
 ::condidtion::condition
+::ocndition::condition
 ::condidtions::conditions
-::conditionsof::conditions of
 ::condolances::condolences
 ::conferance::conference
 ::confidental::confidential
 ::confidentally::confidentially
 ::confids::confides
 ::configureable::configurable
+::configuraiton::configuration
+::configuraoitn::configuration
 ::confirmmation::confirmation
+::ocnfirmed::confirmed
 ::coform::conform
+::confusnig::confusing
 ::congradulations::congratulations
 ::congresional::congressional
 ::conjecutre::conjecture
 ::conjuction::conjunction
+::connet::connect
 ::conected::connected
+::conneted::connected
 ::conneticut::Connecticut
+::conneting::connecting
 ::conection::connection
+::connectino::connection
+::connetion::connection
+::connetions::connections
+::connetors::connectors
 ::conived::connived
 ::cannotation::connotation
 ::cannotations::connotations
@@ -1845,7 +1811,11 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::concidering::considering
 ::conciders::considers
 ::consistant::consistent
+::consistnet::consistent
 ::consistantly::consistently
+::consistnelty::consistently
+::consistnetly::consistently
+::consistntely::consistently
 ::consolodate::consolidate
 ::consolodated::consolidated
 ::consonent::consonant
@@ -1855,7 +1825,9 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::conspiricy::conspiracy
 ::conspiriator::conspirator
 ::constatn::constant
+::constnat::constant
 ::constanly::constantly
+::constnatly::constantly
 ::constarnation::consternation
 ::consituencies::constituencies
 ::consituency::constituency
@@ -1867,6 +1839,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::costitution::constitution
 ::consitutional::constitutional
 ::constituional::constitutional
+::constriant::constraint
 ::constaints::constraints
 ::consttruction::construction
 ::constuction::construction
@@ -1897,6 +1870,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::contritutions::contributions
 ::contributer::contributor
 ::contributers::contributors
+::contorl::control
 ::controll::control
 ::controled::controlled
 ::controling::controlling
@@ -1923,6 +1897,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::cooporate::cooperate
 ::coordiantion::coordination
 ::cpoy::copy
+::copyrigth::copyright
 ::copywrite::copyright
 ::coridal::cordial
 ::corparate::corporate
@@ -1930,7 +1905,11 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::coorperations::corporations
 ::corperations::corporations
 ::corproations::corporations
+::corret::correct
+::correciton::correction
+::corretly::correctly
 ::correcters::correctors
+::correlatoin::correlation
 ::corrispond::correspond
 ::corrisponded::corresponded
 ::correspondant::correspondent
@@ -1946,12 +1925,14 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::corruptable::corruptible
 ::cotten::cotton
 ::coudl::could
-::could of::could have
+::oculd::could
+::ucould::could
 ::couldthe::could the
 ::coudln't::couldn't
 ::coudn't::couldn't
 ::couldnt::couldn't
 ::coucil::council
+::counterfiet::counterfeit
 ::counries::countries
 ::countires::countries
 ::ocuntries::countries
@@ -1972,7 +1953,11 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::crystalisation::crystallisation
 ::culiminating::culminating
 ::cumulatative::cumulative
+::curiousity::curiosity
+::currnet::current
 ::currenly::currently
+::curretnly::currently
+::currnets::currents
 ::ciriculum::curriculum
 ::curriculem::curriculum
 ::cusotmer::customer
@@ -2763,7 +2748,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::habaeus::habeas
 ::habeus::habeas
 ::habsbourg::Habsburg
-::hda::had
+:c:hda::had
 ::hadbeen::had been
 ::haemorrage::haemorrhage
 ::hallowean::Halloween
@@ -3154,7 +3139,8 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::journies::journeys
 ::juadaism::Judaism
 ::juadism::Judaism
-::judgment::judgement
+::judgement::judgment ;  "without the -e is preferred in law globally, and in American English"
+::judgements::judgments ;  "without the -e is preferred in law globally, and in American English"
 ::jugment::judgment
 ::judical::judicial
 ::juducial::judicial
@@ -3328,7 +3314,6 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::mathmaticians::mathematicians
 ::mathamatics::mathematics
 ::mathematicas::mathematics
-::may of::may have
 ::mccarthyst::mccarthyist
 ::meaninng::meaning
 ::menat::meant
@@ -3374,7 +3359,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::mileau::milieu
 ::mileu::milieu
 ::melieux::milieux
-::miliary::military
+; ::miliary::military ; miliary dermatitis
 ::miliraty::military
 ::millitary::military
 ::miltary::military
@@ -3597,12 +3582,8 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::odouriferous::odoriferous
 ::odourous::odorous
 ::ouevre::oeuvre
-::fo::of
-:C:fo::of
-:C:od::of
 ::ofits::of its
 ::ofthe::of the
-::oft he::of the ; Could be legitimate in poetry, but more usually a typo.
 ::offereings::offerings
 ::offcers::officers
 ::offical::official
@@ -3671,7 +3652,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::origional::original
 ::orginally::originally
 ::origanaly::originally
-::originall::originally
+; ::originall::originally, original
 ::originaly::originally
 ::originially::originally
 ::originnally::originally
@@ -4483,7 +4464,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::smoothe::smooth
 ::smoothes::smooths
 ::sneeks::sneaks
-::snese::sneeze
+; ::snese::sneeze ; More likely to be mistyped "sense" than misspelled "sneeze"
 ::sot hat::so that
 ::soical::social
 ::socalism::socialism
@@ -4555,7 +4536,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::stainlees::stainless
 ::stnad::stand
 ::standars::standards
-::strat::start
+; ::strat::start   Stratocaster
 ::statment::statement
 ::statememts::statements
 ::statments::statements
@@ -4894,7 +4875,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::threee::three
 ::threshhold::threshold
 ::throuhg::through
-::thru::through
+;::thru::through       ;used as an alternate spelling in some contexts
 ::thoughout::throughout
 ::througout::throughout
 ::tiget::tiger
@@ -5161,7 +5142,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::whant::want
 ::wnat::want
 ::wan tit::want it
-::wanna::want to
+; ::wanna::want to ;INTENTIONAL
 ::wnated::wanted
 ::whants::wants
 ::wnats::wants
@@ -5178,7 +5159,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::wayword::wayward
 ::we;d::we'd
 ::weaponary::weaponry
-::wether::weather
+;::wether::weather   ; ambiguous: leave uncorrected
 ::wendsay::Wednesday
 ::wensday::Wednesday
 ::wiegh::weigh
@@ -5221,7 +5202,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::wille::will
 ::wiull::will
 ::willbe::will be
-::will of::will have
+;::will of::will have  ; "will of the voters"
 ::willingless::willingness
 ::windoes::windows
 ::wintery::wintry
@@ -5257,7 +5238,6 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::woudl::would
 ::wuould::would
 ::wouldbe::would be
-::would of::would have
 ::woudln't::wouldn't
 ::wouldnt::wouldn't
 ::wresters::wrestlers
@@ -5286,7 +5266,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::yuo::you
 ::youare::you are
 ::youd::you'd
-::your’e::you're
+::yourâ€™e::you're
 ::your a::you're a
 ::your an::you're an
 ::your her::you're her
@@ -5309,19 +5289,19 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ;------------------------------------------------------------------------------
 ; Generated Misspellings - the main list
 ;------------------------------------------------------------------------------
-#include generatedwords.ahk
+#include %A_ScriptDir%\generatedwords.ahk
 
 ;------------------------------------------------------------------------------
 ; Ambiguous entries.  Where desired, pick the one that's best for you, edit,
 ; and move into the above list or, preferably, the autocorrect user file.
 ;------------------------------------------------------------------------------
 /*
-:*:cooperat::coöperat
-::(c)::©
-::(r)::®
-::(tm)::™
-::a gogo::à gogo
-::abbe::abbé
+:*:cooperat::coÃ¶perat
+::(c)::Â©
+::(r)::Â®
+::(tm)::â„¢
+::a gogo::Ã  gogo
+::abbe::abbÃ©
 ::accension::accession, ascension
 ::achive::achieve, archive
 ::achived::achieved, archived
@@ -5333,12 +5313,12 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::affort::afford, effort
 ::agin::again, a gin, aging
 ::agina::again, angina
-::ago-go::àgo-go
+::ago-go::Ã go-go
 ::aledge::allege, a ledge
 ::alot::a lot, allot
 ::alusion::allusion, illusion
 ::amature::armature, amateur
-::anu::añu
+::anu::aÃ±u
 ::anual::annual, anal
 ::anual::annual, manual
 ::aparent::apparent, a parent
@@ -5356,18 +5336,19 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::behavour::behavior, behaviour
 ::belives::believes, beliefs
 ::boaut::bout, boat, about
-::Bon::Bön
-::assasined::assassinated Broken by ":*:assasin::", but no great loss.
-::Bootes::Boötes
-::bric-a-brac::bric-à-brac
+::Bon::BÃ¶n
+
+::assasined::assassinated ; Broken by ":*:assasin::", but no great loss.
+::Bootes::BoÃ¶tes
+::bric-a-brac::bric-Ã -brac
 ::buring::burying, burning, burin, during
 ::busineses::business, businesses
-::cafe::café
+::cafe::cafÃ©
 ::calaber::caliber, calibre
 ::calander::calendar, calender, colander
 ::cancelled::canceled  ; commonwealth vs US
 ::cancelling::canceling  ; commonwealth vs US
-::canon::cañon
+::canon::caÃ±on
 ::cant::cannot, can not, can't
 ::carcas::carcass, Caracas
 ::carmel::caramel, carmel-by-the-sea
@@ -5379,9 +5360,9 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::clera::clear, sclera
 ::comander::commander, commandeer
 ::competion::competition, completion
-::continuum::continuüm
-::coopt::coöpt
-::coordinat::coördinat
+::continuum::continuÃ¼m
+::coopt::coÃ¶pt
+::coordinat::coÃ¶rdinat
 ::coorperation::cooperation, corporation
 ::coudl::could, cloud
 ::councellor::councillor, counselor, councilor
@@ -5389,15 +5370,15 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::coururier::courier, couturier
 ::coverted::converted, covered, coveted
 ::cpoy::coy, copy
-::creme::crème
+::creme::crÃ¨me
 ::dael::deal, dial, dahl
 ::deram::dram, dream
 ::desparate::desperate, disparate
 ::diea::idea, die
 ::dieing::dying, dyeing
 ::diversed::diverse, diverged
-::divorce::divorcé
-::Dona::Doña
+::divorce::divorcÃ©
+::Dona::DoÃ±a
 ::doub::doubt, daub
 ::dyas::dryas, Dyas (Robert Dyas is a hardware chain), dais
 ::efford::effort, afford
@@ -5405,7 +5386,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::eigth::eighth, eight
 ::electic::eclectic, electric
 ::electon::election, electron
-::elite::élite
+::elite::Ã©lite
 ::emition::emission, emotion
 ::emminent::eminent, imminent
 ::empirial::empirical, imperial
@@ -5413,8 +5394,8 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::erally::orally, really
 ::erested::arrested, erected
 ::ethose::those, ethos
-::etude::étude
-::expose::exposé
+::etude::Ã©tude
+::expose::exposÃ©
 ::extint::extinct, extant
 ::eyar::year, eyas
 ::eyars::years, eyas
@@ -5423,7 +5404,6 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::fiels::feels, fields, files, phials
 ::firts::flirts, first
 ::fleed::fled, freed
-::fo::for, of
 ::fomr::from, form
 ::fontrier::fontier, frontier
 ::fro::for, to and fro, (a)fro
@@ -5458,7 +5438,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::israelies::Israelis, Israelites
 ::labatory::lavatory, laboratory
 ::labled::labelled, labeled
-::lame::lamé
+::lame::lamÃ©
 ::leanr::lean, learn, leaner
 ::lible::libel, liable
 ::liscense::license, licence
@@ -5477,35 +5457,36 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::manuevers::maneuvers, manoeuvres
 ::mear::wear, mere, mare
 ::meranda::veranda, Miranda
-::Metis::Métis
+::Metis::MÃ©tis
 ::mit::mitt, M.I.T., German "with"
 ::monestary::monastery, monetary
 ::moreso::more, more so
 ::muscels::mussels, muscles
-::ne::né
+::ne::nÃ©
 ::neice::niece, nice
 ::neigbour::neighbour, neighbor
 ::neigbouring::neighbouring, neighboring
 ::neigbours::neighbours, neighbors
 ::nto:: not ; Replaced with case sensitive for NTO acronym.
+::od::do
 ::oging::going, ogling
-::ole::olé
+::ole::olÃ©
 ::onot::note, not
-::opium::opïum
-::ore::öre
-::ore::øre
+::opium::opÃ¯um
+::ore::Ã¶re
+::ore::Ã¸re
 ::orgin::origin, organ
 ::palce::place, palace
-::pate::pâte
-::pate::pâté
+::pate::pÃ¢te
+::pate::pÃ¢tÃ©
 ::performes::performed, performs
 ::personel::personnel, personal
 ::positon::position, positron
-::preëmpt
-::premiere::première
-::premiered::premièred
-::premieres::premières
-::premiering::premièring
+::preÃ«mpt
+::premiere::premiÃ¨re
+::premiered::premiÃ¨red
+::premieres::premiÃ¨res
+::premiering::premiÃ¨ring
 ::procede::proceed, precede
 ::proceded::proceeded, preceded
 ::procedes::proceeds, precedes
@@ -5516,15 +5497,15 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::prominately::prominently, predominately
 ::qtuie::quite, quiet
 ::qutie::quite, quiet
-::reenter::reënter
+::reenter::reÃ«nter
 ::relized::realised, realized
 ::repatition::repetition, repartition
-::residuum::residuüm
+::residuum::residuÃ¼m
 ::restraunt::restraint, restaurant
-::resume::résumé
+::resume::rÃ©sumÃ©
 ::rigeur::rigueur, rigour, rigor
-::role::rôle
-::rose::rosé
+::role::rÃ´le
+::rose::rosÃ©
 ::sasy::says, sassy
 ::scholarstic::scholastic, scholarly
 ::secceeded::seceded, succeeded
@@ -5552,6 +5533,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::thast::that, that's
 ::theather::theater, theatre
 ::ther::there, their, the
+::thse::these, those
 ::thikning::thinking, thickening
 ::throught::thought, through, throughout
 ::tiem::time, Tim
@@ -5561,7 +5543,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::travelling::traveling   ; commonwealth vs US
 ::troups::troupes, troops
 ::turnk::turnkey, trunk
-::uber::über
+::uber::Ã¼ber
 ::unmanouverable::unmaneuverable, unmanoeuvrable
 ::unsed::used, unused, unsaid
 ::vigeur::vigueur, vigour, vigor
@@ -5575,7 +5557,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::woulf::would, wolf
 ::ws::was, www.example.ws
 ::Yementite::Yemenite, Yemeni
-:?:oology::oölogy
+:?:oology::oÃ¶logy
 :?:t he:: the  ; Can't use this. Needs to be cleverer.
 */
 
@@ -5588,7 +5570,8 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::thursday::Thursday
 ::friday::Friday
 ::saturday::Saturday
-::sunday::Sunday 
+::sunday::Sunday
+
 ::january::January
 ::february::February
 ; ::march::March  ; Commented out because it matches the common word "march".
@@ -5605,17 +5588,22 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::fpga::FPGA
 ::pcie::PCIe
 ::icd::ICD
+::fw::FW
+::scadapp::SCADApp
+::scad::SCAD
 ;-------------------------------------------------------------------------------
 ; Anything below this point was added to the script by the user via the Win+H hotkey.
 ;-------------------------------------------------------------------------------
-::defualt::default 
-::rescheulde::reschedule 
-::mintues::minutes 
+::defualt::default
+::rescheulde::reschedule
+::mintues::minutes
 ::theyre::they're
 ::theyll::they'll
 ::theyd::they'd
-::machien::machine 
-::i::I 
+::machien::machine
+::i::I
+::fo::of
+::fi::if
 ::awhiel::awhile
 ::emial::email
 ::btter::better
@@ -5632,7 +5620,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::excatly::exactly
 ::someoen::someone
 ::determing::determining
-::osme ::some 
+::osme ::some
 ::hopeuflyl ::hopefully
 ::questios::questions
 ::offerred::offered
@@ -5640,9 +5628,9 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::poitn::point
 ::confsued::confused
 ::documention::documentation
-::udnerstanding ::understanding 
+::udnerstanding ::understanding
 ::cehck::check
-::ocnfused ::confused 
+::ocnfused ::confused
 ::instaed::instead
 ::implmeneted ::implemented
 ::confrim::confirm
@@ -5651,20 +5639,20 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::quesiton::questIon
 ::advatnage::advantage
 ::al lthe::all the
-::cant ::can't 
+::cant ::can't
 ::interestin::interest in
-::mtnioned ::mentioned 
+::mtnioned ::mentioned
 ::inteeresting::interesting
 ::implmenetation::implementation
 ::kown::known
 ::incompatibiility::incompatibility
-::hoep ::hope 
+::hoep ::hope
 ::unlcok::unlock
 ::oyu::you
 ::yaer::year
 ::descriptoins::descriptions
 ::installa::installation
-::quesitonalbe ::questionable 
+::quesitonalbe ::questionable
 ::amn::man
 ::fro::for
 ::intesreting::interesting
@@ -5676,23 +5664,23 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::confusgin::confusing
 ::repot::report
 ::licesne::license
-::pilling ::piling 
+::pilling ::piling
 ::wont::won't
-::resovle ::resolve 
+::resovle ::resolve
 ::cant::can't
 ::Suggetsions::Suggestions
 ::thnaks::thanks
 ::hoep::hope
 ::presentatino::presentation
-::specificed::specified 
-::dya::day 
+::specificed::specified
+::dya::day
 ::docn::documentation
 ::docs::documents
 ::doc::document
-::depdning ::depending 
+::depdning ::depending
 ::votlages::voltages
 ::deisgn::desIgn
-::youv’e::you've
+::youvâ€™e::you've
 ::ahvent::haven't
 ::can not::cannot
 ::throough::thorough
@@ -5700,9 +5688,9 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::ompany::company
 ::ackolwedgement::acknowledgement
 ::signle::single
-::familir::familiar 
+::familir::familiar
 ::tahnks::thanks
-::your’e::you're
+::yourâ€™e::you're
 ::questionaire::questionnaire
 ::ppl::people
 ::serach::search
@@ -5720,7 +5708,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::Techncially::Technically
 ::spreadhsset::spreadsheet
 ::confirmmed::confirmed
-::interepretted ::interpreted 
+::interepretted ::interpreted
 ::implmeneted::implemented
 ::advantges::advantages
 ::Unforntuately::Unfortunately
@@ -5738,19 +5726,18 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::coupel::couple
 ::Unfortuantley::Unfortunatley
 ::alogn::along
-::woudn’t::wouldn’t
+::woudnâ€™t::wouldnâ€™t
 ::thakns::thanks
 ::respresnted::represented
 ::challenege::challenge
 ::appercaite::appreciate
 ::forsee::foresee
 ::wsa::was
-::fi::if
 ::jtag::JTAG
 ::avstx8::AvSTx8
 ::avstx32::AvSTx32
 ::pu::up
-::opencl::OpenCL 
+::opencl::OpenCL
 ::schedeuled::scheduled
 ::jesd::JESD
 ::orf::for
@@ -5844,14 +5831,14 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::determininstic::deterministic
 ::Hye::Hey
 ::lokoing::looking
-::hsan’t::hasn’t
+::hsanâ€™t::hasnâ€™t
 ::bene::been
 ::roled::rolled
 ::noe::one
 ::ilke::like
 ::oru::our
 ::selectino::selection
-::hsouldn’t::shouldn’t
+::hsouldnâ€™t::shouldnâ€™t
 ::meteing::meeting
 ::quetsion::question
 ::whats::what's
@@ -5860,7 +5847,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::th e::the
 ::ucstomers::customers
 ::ilnks::links
-::youv’e::you’ve
+::youvâ€™e::youâ€™ve
 ::brining::bringing
 ::saerch::search
 ::blieve::believe
@@ -5934,7 +5921,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::shcematics::schematics
 ::hwy::why
 ::adddressing::addressing
-::addressnig ::addressing 
+::addressnig ::addressing
 ::ahven't::haven't
 ::youe'r::you're
 ::disucsison::discussion
@@ -5963,7 +5950,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::pgorammer::programmer
 ::youer::you're
 ::youv'e::you've
-::yorue::you're 
+::yorue::you're
 ::clsoe::close
 ::Antony::Anthony
 ::intenral::internal
@@ -6038,7 +6025,7 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::reporsitory::repository
 ::expesnive::expensive
 ::informatin::information
-::questino::question 
+::questino::question
 ::tomororw::tomorrow
 ::apparoch::appraoch
 ::depednencey::dependencey
@@ -6068,3 +6055,5126 @@ return  ; This makes the above hotstrings do nothing so that they override the i
 ::bascially::basically
 ::workin::working
 ::lookin::looking
+::checkins::check-ins
+; custom made based on frequently used
+::tht::that
+::tha::that
+::htat::that
+::hatt::that
+::taht::that
+::thta::that
+::ython::python
+::pthon::python
+::pyhon::python
+::pyton::python
+::pythn::python
+::pytho::python
+::ypthon::python
+::ytphon::python
+::ythpon::python
+::ythopn::python
+::ythonp::python
+::ptyhon::python
+::pthyon::python
+::pthoyn::python
+::pthony::python
+::pyhton::python
+::pyhotn::python
+::pyhont::python
+::pytohn::python
+::pytonh::python
+::pythno::python
+::hve::have
+::hav::have
+::ahve::have
+::avhe::have
+::aveh::have
+::hvae::have
+::hvea::have
+::haev::have
+::ths::this
+::thi::this
+::htis::this
+::tihs::this
+::tish::this
+::thsi::this
+::wht::what
+::hwat::what
+::hawt::what
+::hatw::what
+::waht::what
+::wath::what
+::whta::what
+::ith::with
+::wth::with
+::wih::with
+::iwth::with
+::itwh::with
+::ithw::with
+::wtih::with
+::wthi::with
+::wiht::with
+::thena::Athena
+::Ahena::Athena
+::Atena::Athena
+::Athna::Athena
+::Athea::Athena
+::Athen::Athena
+::tAhena::Athena
+::thAena::Athena
+::theAna::Athena
+::thenAa::Athena
+::thenaA::Athena
+::Ahtena::Athena
+::Ahetna::Athena
+::Ahenta::Athena
+::Ahenat::Athena
+::Atehna::Athena
+::Atenha::Athena
+::Atenah::Athena
+::Athnea::Athena
+::Athnae::Athena
+::Athean::Athena
+::kow::know
+::knw::know
+::kno::know
+::nkow::know
+::nokw::know
+::nowk::know
+::konw::know
+::kown::know
+::knwo::know
+::hink::think
+::thnk::think
+::thik::think
+::htink::think
+::hitnk::think
+::hintk::think
+::hinkt::think
+::tihnk::think
+::tinhk::think
+::tinkh::think
+::thnik::think
+::thnki::think
+::thikn::think
+::fom::from
+::frm::from
+::rfom::from
+::rofm::from
+::romf::from
+::frmo::from
+::oday::today
+::tday::today
+::toay::today
+::toda::today
+::otday::today
+::odtay::today
+::odaty::today
+::odayt::today
+::tdoay::today
+::tdaoy::today
+::tdayo::today
+::todya::today
+::eeting::meeting
+::meeing::meeting
+::meetng::meeting
+::meetig::meeting
+::meetin::meeting
+::emeting::meeting
+::eemting::meeting
+::eetming::meeting
+::eetimng::meeting
+::eetinmg::meeting
+::eetingm::meeting
+::meteing::meeting
+::metieng::meeting
+::metineg::meeting
+::metinge::meeting
+::meeitng::meeting
+::meeintg::meeting
+::meeingt::meeting
+::meetnig::meeting
+::meetngi::meeting
+::meetign::meeting
+::wnt::want
+::awnt::want
+::anwt::want
+::antw::want
+::wnat::want
+::wnta::want
+::watn::want
+::Hrris::Harris
+::Haris::Harris
+::Harrs::Harris
+::Harri::Harris
+::aHrris::Harris
+::arHris::Harris
+::arrHis::Harris
+::arriHs::Harris
+::arrisH::Harris
+::Hraris::Harris
+::Hrrais::Harris
+::Hrrias::Harris
+::Hrrisa::Harris
+::Harirs::Harris
+::Harisr::Harris
+::Harrsi::Harris
+::mke::make
+::amke::make
+::akme::make
+::akem::make
+::mkae::make
+::mkea::make
+::maek::make
+::fle::file
+::ifle::file
+::ilfe::file
+::ilef::file
+::flie::file
+::flei::file
+::fiel::file
+::omething::something
+::smething::something
+::soething::something
+::somthing::something
+::somehing::something
+::someting::something
+::somethng::something
+::somethig::something
+::somethin::something
+::osmething::something
+::omsething::something
+::omesthing::something
+::ometshing::something
+::omethsing::something
+::omethisng::something
+::omethinsg::something
+::omethings::something
+::smoething::something
+::smeothing::something
+::smetohing::something
+::smethoing::something
+::smethiong::something
+::smethinog::something
+::smethingo::something
+::soemthing::something
+::soetmhing::something
+::soethming::something
+::soethimng::something
+::soethinmg::something
+::soethingm::something
+::somtehing::something
+::somtheing::something
+::somthieng::something
+::somthineg::something
+::somthinge::something
+::somehting::something
+::somehitng::something
+::somehintg::something
+::somehingt::something
+::sometihng::something
+::sometinhg::something
+::sometingh::something
+::somethnig::something
+::somethngi::something
+::somethign::something
+::rint::print
+::prnt::print
+::prit::print
+::prin::print
+::rpint::print
+::ripnt::print
+::rinpt::print
+::rintp::print
+::pirnt::print
+::pinrt::print
+::pintr::print
+::prnit::print
+::prnti::print
+::pritn::print
+::ont::dont
+::dnt::dont
+::odnt::dont
+::ondt::dont
+::ontd::dont
+::dnot::dont
+::dnto::dont
+::dotn::dont
+::wll::will
+::wil::will
+::iwll::will
+::ilwl::will
+::illw::will
+::wlil::will
+::wlli::will
+::cass::class
+::clss::class
+::clas::class
+::lcass::class
+::lacss::class
+::lascs::class
+::lassc::class
+::calss::class
+::casls::class
+::cassl::class
+::clsas::class
+::clssa::class
+::mre::more
+::omre::more
+::orme::more
+::orem::more
+::mroe::more
+::mreo::more
+::moer::more
+::ach::Zach
+::Zch::Zach
+::Zah::Zach
+::Zac::Zach
+::aZch::Zach
+::acZh::Zach
+::achZ::Zach
+::Zcah::Zach
+::Zcha::Zach
+::Zahc::Zach
+::nterrupt::interrupt
+::iterrupt::interrupt
+::inerrupt::interrupt
+::intrrupt::interrupt
+::interupt::interrupt
+::interrpt::interrupt
+::interrut::interrupt
+::interrup::interrupt
+::niterrupt::interrupt
+::ntierrupt::interrupt
+::nteirrupt::interrupt
+::nterirupt::interrupt
+::nterriupt::interrupt
+::nterruipt::interrupt
+::nterrupit::interrupt
+::nterrupti::interrupt
+::itnerrupt::interrupt
+::itenrrupt::interrupt
+::iternrupt::interrupt
+::iterrnupt::interrupt
+::iterrunpt::interrupt
+::iterrupnt::interrupt
+::iterruptn::interrupt
+::inetrrupt::interrupt
+::inertrupt::interrupt
+::inerrtupt::interrupt
+::inerrutpt::interrupt
+::inerruptt::interrupt
+::intrerupt::interrupt
+::intrreupt::interrupt
+::intrruept::interrupt
+::intrrupet::interrupt
+::intrrupte::interrupt
+::interurpt::interrupt
+::interuprt::interrupt
+::interuptr::interrupt
+::interrput::interrupt
+::interrptu::interrupt
+::interrutp::interrupt
+::avi::Ravi
+::Rvi::Ravi
+::Rai::Ravi
+::Rav::Ravi
+::aRvi::Ravi
+::avRi::Ravi
+::aviR::Ravi
+::Rvai::Ravi
+::Rvia::Ravi
+::Raiv::Ravi
+::icole::Nicole
+::Ncole::Nicole
+::Niole::Nicole
+::Nicle::Nicole
+::Nicoe::Nicole
+::Nicol::Nicole
+::iNcole::Nicole
+::icNole::Nicole
+::icoNle::Nicole
+::icolNe::Nicole
+::icoleN::Nicole
+::Nciole::Nicole
+::Ncoile::Nicole
+::Ncolie::Nicole
+::Ncolei::Nicole
+::Niocle::Nicole
+::Niolce::Nicole
+::Niolec::Nicole
+::Nicloe::Nicole
+::Nicleo::Nicole
+::Nicoel::Nicole
+::srt::sort
+::sor::sort
+::osrt::sort
+::orst::sort
+::srot::sort
+::srto::sort
+::sotr::sort
+::oogle::google
+::gogle::google
+::googe::google
+::googl::google
+::ogogle::google
+::ooggle::google
+::gogole::google
+::gogloe::google
+::gogleo::google
+::goolge::google
+::gooleg::google
+::googel::google
+::lse::else
+::ele::else
+::esle::else
+::esel::else
+::eles::else
+::oing::going
+::goig::going
+::goin::going
+::oging::going
+::oigng::going
+::oingg::going
+::giong::going
+::ginog::going
+::gingo::going
+::gonig::going
+::gongi::going
+::goign::going
+::ight::right
+::rght::right
+::riht::right
+::rigt::right
+::righ::right
+::irght::right
+::igrht::right
+::ighrt::right
+::ightr::right
+::rgiht::right
+::rghit::right
+::rghti::right
+::rihgt::right
+::rihtg::right
+::rigth::right
+::tey::they
+::htey::they
+::hety::they
+::heyt::they
+::tehy::they
+::teyh::they
+::thye::they
+::tere::there
+::thre::there
+::ther::there
+::htere::there
+::hetre::there
+::herte::there
+::heret::there
+::tehre::there
+::terhe::there
+::tereh::there
+::theer::there
+::hich::which
+::whch::which
+::whih::which
+::whic::which
+::hwich::which
+::hiwch::which
+::hicwh::which
+::hichw::which
+::wihch::which
+::wichh::which
+::whcih::which
+::whchi::which
+::whihc::which
+::ust::just
+::jst::just
+::ujst::just
+::usjt::just
+::ustj::just
+::jsut::just
+::jstu::just
+::lso::also
+::aso::also
+::alo::also
+::laso::also
+::lsao::also
+::lsoa::also
+::aslo::also
+::asol::also
+::alos::also
+::Gry::Gary
+::Gay::Gary
+::Gar::Gary
+::aGry::Gary
+::arGy::Gary
+::aryG::Gary
+::Gray::Gary
+::Grya::Gary
+::Gayr::Gary
+::ubmodule::submodule
+::sbmodule::submodule
+::sumodule::submodule
+::subodule::submodule
+::submdule::submodule
+::submoule::submodule
+::submodle::submodule
+::submodue::submodule
+::submodul::submodule
+::usbmodule::submodule
+::ubsmodule::submodule
+::ubmsodule::submodule
+::ubmosdule::submodule
+::ubmodsule::submodule
+::ubmodusle::submodule
+::ubmodulse::submodule
+::ubmodules::submodule
+::sbumodule::submodule
+::sbmuodule::submodule
+::sbmoudule::submodule
+::sbmoduule::submodule
+::sumbodule::submodule
+::sumobdule::submodule
+::sumodbule::submodule
+::sumoduble::submodule
+::sumodulbe::submodule
+::sumoduleb::submodule
+::subomdule::submodule
+::subodmule::submodule
+::subodumle::submodule
+::subodulme::submodule
+::subodulem::submodule
+::submdoule::submodule
+::submduole::submodule
+::submduloe::submodule
+::submduleo::submodule
+::submoudle::submodule
+::submoulde::submodule
+::submouled::submodule
+::submodlue::submodule
+::submodleu::submodule
+::submoduel::submodule
+::eatrice::Beatrice
+::Batrice::Beatrice
+::Betrice::Beatrice
+::Bearice::Beatrice
+::Beatice::Beatrice
+::Beatrce::Beatrice
+::Beatrie::Beatrice
+::Beatric::Beatrice
+::eBatrice::Beatrice
+::eaBtrice::Beatrice
+::eatBrice::Beatrice
+::eatrBice::Beatrice
+::eatriBce::Beatrice
+::eatricBe::Beatrice
+::eatriceB::Beatrice
+::Baetrice::Beatrice
+::Baterice::Beatrice
+::Batreice::Beatrice
+::Batriece::Beatrice
+::Batricee::Beatrice
+::Betarice::Beatrice
+::Betraice::Beatrice
+::Betriace::Beatrice
+::Betricae::Beatrice
+::Betricea::Beatrice
+::Beartice::Beatrice
+::Bearitce::Beatrice
+::Bearicte::Beatrice
+::Bearicet::Beatrice
+::Beatirce::Beatrice
+::Beaticre::Beatrice
+::Beaticer::Beatrice
+::Beatrcie::Beatrice
+::Beatrcei::Beatrice
+::Beatriec::Beatrice
+::Jke::Jake
+::Jae::Jake
+::Jak::Jake
+::aJke::Jake
+::akJe::Jake
+::akeJ::Jake
+::Jkae::Jake
+::Jkea::Jake
+::Jaek::Jake
+::ahena::athena
+::atena::athena
+::athna::athena
+::athea::athena
+::athen::athena
+::tahena::athena
+::thaena::athena
+::theana::athena
+::thenaa::athena
+::ahtena::athena
+::ahetna::athena
+::ahenta::athena
+::ahenat::athena
+::atehna::athena
+::atenha::athena
+::atenah::athena
+::athnea::athena
+::athnae::athena
+::athean::athena
+::ime::time
+::tme::time
+::itme::time
+::imte::time
+::imet::time
+::tmie::time
+::tmei::time
+::tiem::time
+::Dve::Dave
+::Dae::Dave
+::Dav::Dave
+::aDve::Dave
+::avDe::Dave
+::aveD::Dave
+::Dvae::Dave
+::Dvea::Dave
+::Daev::Dave
+::eed::need
+::ened::need
+::eend::need
+::eedn::need
+::nede::need
+::ame::name
+::nme::name
+::anme::name
+::amne::name
+::nmae::name
+::nmea::name
+::naem::name
+::thn::then
+::hten::then
+::hetn::then
+::tehn::then
+::tenh::then
+::thne::then
+::Mke::Mike
+::Mie::Mike
+::Mik::Mike
+::iMke::Mike
+::ikMe::Mike
+::ikeM::Mike
+::Mkie::Mike
+::Mkei::Mike
+::Miek::Mike
+::ork::work
+::wrk::work
+::wor::work
+::owrk::work
+::orwk::work
+::orkw::work
+::wrok::work
+::wrko::work
+::wokr::work
+::yur::your
+::yor::your
+::oyur::your
+::ouyr::your
+::oury::your
+::yuor::your
+::yuro::your
+::yoru::your
+::earch::search
+::sarch::search
+::serch::search
+::seach::search
+::searh::search
+::searc::search
+::esarch::search
+::easrch::search
+::earsch::search
+::earcsh::search
+::earchs::search
+::saerch::search
+::sarech::search
+::sarceh::search
+::sarche::search
+::serach::search
+::sercah::search
+::sercha::search
+::seacrh::search
+::seachr::search
+::searhc::search
+::hould::should
+::sould::should
+::shuld::should
+::shold::should
+::shoud::should
+::shoul::should
+::hsould::should
+::hosuld::should
+::housld::should
+::houlsd::should
+::houlds::should
+::sohuld::should
+::souhld::should
+::soulhd::should
+::souldh::should
+::shuold::should
+::shulod::should
+::shuldo::should
+::sholud::should
+::sholdu::should
+::shoudl::should
+::tst::test
+::etst::test
+::estt::test
+::tset::test
+::tste::test
+::tets::test
+::ood::good
+::ogod::good
+::oogd::good
+::oodg::good
+::godo::good
+::eben::been
+::eebn::been
+::eenb::been
+::ould::would
+::wuld::would
+::woud::would
+::woul::would
+::owuld::would
+::ouwld::would
+::oulwd::would
+::ouldw::would
+::wuold::would
+::wulod::would
+::wuldo::would
+::wolud::would
+::woldu::would
+::woudl::would
+::orking::working
+::wrking::working
+::woring::working
+::workng::working
+::workig::working
+::workin::working
+::owrking::working
+::orwking::working
+::orkwing::working
+::orkiwng::working
+::orkinwg::working
+::orkingw::working
+::wroking::working
+::wrkoing::working
+::wrkiong::working
+::wrkinog::working
+::wrkingo::working
+::wokring::working
+::wokirng::working
+::wokinrg::working
+::wokingr::working
+::worikng::working
+::worinkg::working
+::woringk::working
+::worknig::working
+::workngi::working
+::workign::working
+::imer::timer
+::tmer::timer
+::timr::timer
+::itmer::timer
+::imter::timer
+::imetr::timer
+::imert::timer
+::tmier::timer
+::tmeir::timer
+::tmeri::timer
+::tiemr::timer
+::tierm::timer
+::timre::timer
+::sre::sure
+::usre::sure
+::urse::sure
+::srue::sure
+::sreu::sure
+::ome::some
+::sme::some
+::soe::some
+::som::some
+::osme::some
+::omse::some
+::omes::some
+::smoe::some
+::smeo::some
+::soem::some
+::Jmie::Jamie
+::Jaie::Jamie
+::Jame::Jamie
+::Jami::Jamie
+::aJmie::Jamie
+::amJie::Jamie
+::amiJe::Jamie
+::amieJ::Jamie
+::Jmaie::Jamie
+::Jmiae::Jamie
+::Jmiea::Jamie
+::Jaime::Jamie
+::Jaiem::Jamie
+::Jamei::Jamie
+::aain::again
+::agan::again
+::agai::again
+::gaain::again
+::aagin::again
+::aaign::again
+::aaing::again
+::agian::again
+::agina::again
+::agani::again
+::oard::board
+::boad::board
+::obard::board
+::oabrd::board
+::oarbd::board
+::oardb::board
+::baord::board
+::barod::board
+::borad::board
+::borda::board
+::boadr::board
+::mght::might
+::miht::might
+::migt::might
+::migh::might
+::imght::might
+::igmht::might
+::ighmt::might
+::ightm::might
+::mgiht::might
+::mghit::might
+::mghti::might
+::mihgt::might
+::mihtg::might
+::migth::might
+::otepad::notepad
+::ntepad::notepad
+::noepad::notepad
+::notpad::notepad
+::notead::notepad
+::notepd::notepad
+::notepa::notepad
+::ontepad::notepad
+::otnepad::notepad
+::otenpad::notepad
+::otepnad::notepad
+::otepand::notepad
+::otepadn::notepad
+::ntoepad::notepad
+::nteopad::notepad
+::ntepoad::notepad
+::ntepaod::notepad
+::ntepado::notepad
+::noetpad::notepad
+::noeptad::notepad
+::noepatd::notepad
+::noepadt::notepad
+::notpead::notepad
+::notpaed::notepad
+::notpade::notepad
+::noteapd::notepad
+::noteadp::notepad
+::notepda::notepad
+::dwn::down
+::odwn::down
+::owdn::down
+::ownd::down
+::dwon::down
+::dwno::down
+::donw::down
+::rying::trying
+::tring::trying
+::tryng::trying
+::tryig::trying
+::tryin::trying
+::rtying::trying
+::ryting::trying
+::ryitng::trying
+::ryintg::trying
+::ryingt::trying
+::triyng::trying
+::trinyg::trying
+::tringy::trying
+::trynig::trying
+::tryngi::trying
+::tryign::trying
+::uild::build
+::bild::build
+::buld::build
+::buid::build
+::buil::build
+::ubild::build
+::uibld::build
+::uilbd::build
+::uildb::build
+::biuld::build
+::bilud::build
+::bildu::build
+::bulid::build
+::buldi::build
+::buidl::build
+::eference::reference
+::rference::reference
+::reerence::reference
+::refrence::reference
+::refeence::reference
+::refernce::reference
+::referece::reference
+::referene::reference
+::referenc::reference
+::erference::reference
+::efrerence::reference
+::eferrence::reference
+::rfeerence::reference
+::reefrence::reference
+::reerfence::reference
+::reerefnce::reference
+::reerenfce::reference
+::reerencfe::reference
+::reerencef::reference
+::refreence::reference
+::refeernce::reference
+::refeenrce::reference
+::refeencre::reference
+::refeencer::reference
+::refernece::reference
+::referncee::reference
+::referecne::reference
+::referecen::reference
+::referenec::reference
+::onfluence::confluence
+::cnfluence::confluence
+::cofluence::confluence
+::conluence::confluence
+::confuence::confluence
+::conflence::confluence
+::conflunce::confluence
+::confluece::confluence
+::confluene::confluence
+::confluenc::confluence
+::ocnfluence::confluence
+::oncfluence::confluence
+::onfcluence::confluence
+::onflcuence::confluence
+::onflucence::confluence
+::onfluecnce::confluence
+::onfluencce::confluence
+::cnofluence::confluence
+::cnfoluence::confluence
+::cnflouence::confluence
+::cnfluoence::confluence
+::cnflueonce::confluence
+::cnfluenoce::confluence
+::cnfluencoe::confluence
+::cnfluenceo::confluence
+::cofnluence::confluence
+::coflnuence::confluence
+::coflunence::confluence
+::cofluennce::confluence
+::conlfuence::confluence
+::conlufence::confluence
+::conluefnce::confluence
+::conluenfce::confluence
+::conluencfe::confluence
+::conluencef::confluence
+::confulence::confluence
+::confuelnce::confluence
+::confuenlce::confluence
+::confuencle::confluence
+::confuencel::confluence
+::confleunce::confluence
+::conflenuce::confluence
+::conflencue::confluence
+::conflenceu::confluence
+::conflunece::confluence
+::confluncee::confluence
+::confluecne::confluence
+::confluecen::confluence
+::confluenec::confluence
+::ade::made
+::mde::made
+::amde::made
+::adme::made
+::adem::made
+::mdae::made
+::mdea::made
+::maed::made
+::CADApp::SCADApp
+::SADApp::SCADApp
+::SCDApp::SCADApp
+::SCAApp::SCADApp
+::SCADpp::SCADApp
+::SCADAp::SCADApp
+::CSADApp::SCADApp
+::CASDApp::SCADApp
+::CADSApp::SCADApp
+::CADASpp::SCADApp
+::CADApSp::SCADApp
+::CADAppS::SCADApp
+::SACDApp::SCADApp
+::SADCApp::SCADApp
+::SADACpp::SCADApp
+::SADApCp::SCADApp
+::SADAppC::SCADApp
+::SCDAApp::SCADApp
+::SCAADpp::SCADApp
+::SCAApDp::SCADApp
+::SCAAppD::SCADApp
+::SCADpAp::SCADApp
+::SCADppA::SCADApp
+::oen::open
+::opn::open
+::poen::open
+::oepn::open
+::oenp::open
+::opne::open
+::doig::doing
+::oding::doing
+::oidng::doing
+::oindg::doing
+::oingd::doing
+::diong::doing
+::dinog::doing
+::donig::doing
+::dongi::doing
+::doign::doing
+::unning::running
+::rnning::running
+::runing::running
+::runnng::running
+::runnig::running
+::runnin::running
+::urnning::running
+::unrning::running
+::unnring::running
+::unnirng::running
+::unninrg::running
+::unningr::running
+::rnuning::running
+::rnnuing::running
+::rnniung::running
+::rnninug::running
+::rnningu::running
+::runinng::running
+::runnnig::running
+::runnngi::running
+::runnign::running
+::etting::getting
+::gtting::getting
+::geting::getting
+::gettng::getting
+::gettig::getting
+::gettin::getting
+::egtting::getting
+::etgting::getting
+::ettging::getting
+::ettigng::getting
+::ettingg::getting
+::gteting::getting
+::gtteing::getting
+::gttieng::getting
+::gttineg::getting
+::gttinge::getting
+::getitng::getting
+::getintg::getting
+::getingt::getting
+::gettnig::getting
+::gettngi::getting
+::gettign::getting
+::reat::great
+::gret::great
+::grea::great
+::rgeat::great
+::regat::great
+::reagt::great
+::reatg::great
+::gerat::great
+::geart::great
+::geatr::great
+::graet::great
+::cde::code
+::coe::code
+::ocde::code
+::odce::code
+::odec::code
+::cdoe::code
+::cdeo::code
+::elp::help
+::hlp::help
+::ehlp::help
+::elhp::help
+::elph::help
+::hlep::help
+::hlpe::help
+::hepl::help
+::alues::values
+::vlues::values
+::vaues::values
+::valus::values
+::avlues::values
+::alvues::values
+::aluves::values
+::aluevs::values
+::aluesv::values
+::vlaues::values
+::vluaes::values
+::vlueas::values
+::vluesa::values
+::vaules::values
+::vauels::values
+::vauesl::values
+::valeus::values
+::valesu::values
+::valuse::values
+::hre::here
+::ehre::here
+::erhe::here
+::ereh::here
+::hree::here
+::heer::here
+::seet::sweet
+::swet::sweet
+::swee::sweet
+::wseet::sweet
+::weset::sweet
+::sewet::sweet
+::seewt::sweet
+::seetw::sweet
+::swete::sweet
+::eam::team
+::etam::team
+::eatm::team
+::eamt::team
+::taem::team
+::tema::team
+::bck::back
+::bak::back
+::bac::back
+::abck::back
+::acbk::back
+::ackb::back
+::bcak::back
+::bcka::back
+::bakc::back
+::fnction::function
+::fuction::function
+::funtion::function
+::funcion::function
+::functon::function
+::functin::function
+::functio::function
+::ufnction::function
+::unfction::function
+::uncftion::function
+::unctfion::function
+::unctifon::function
+::unctiofn::function
+::unctionf::function
+::fnuction::function
+::fncution::function
+::fnctuion::function
+::fnctiuon::function
+::fnctioun::function
+::fnctionu::function
+::fucntion::function
+::fuctnion::function
+::fuctinon::function
+::fuctionn::function
+::funtcion::function
+::funticon::function
+::funtiocn::function
+::funtionc::function
+::funciton::function
+::funciotn::function
+::funciont::function
+::functoin::function
+::functoni::function
+::functino::function
+::aving::having
+::hving::having
+::haing::having
+::havng::having
+::havig::having
+::havin::having
+::ahving::having
+::avhing::having
+::avihng::having
+::avinhg::having
+::avingh::having
+::hvaing::having
+::hviang::having
+::hvinag::having
+::hvinga::having
+::haivng::having
+::hainvg::having
+::haingv::having
+::havnig::having
+::havngi::having
+::havign::having
+::omorrow::tomorrow
+::tmorrow::tomorrow
+::toorrow::tomorrow
+::tomrrow::tomorrow
+::tomorow::tomorrow
+::tomorrw::tomorrow
+::tomorro::tomorrow
+::otmorrow::tomorrow
+::omtorrow::tomorrow
+::omotrrow::tomorrow
+::omortrow::tomorrow
+::omorrtow::tomorrow
+::omorrotw::tomorrow
+::omorrowt::tomorrow
+::tmoorrow::tomorrow
+::toomrrow::tomorrow
+::toormrow::tomorrow
+::toorrmow::tomorrow
+::toorromw::tomorrow
+::toorrowm::tomorrow
+::tomrorow::tomorrow
+::tomrroow::tomorrow
+::tomororw::tomorrow
+::tomorowr::tomorrow
+::tomorrwo::tomorrow
+::lorida::Florida
+::Forida::Florida
+::Flrida::Florida
+::Floida::Florida
+::Florda::Florida
+::Floria::Florida
+::Florid::Florida
+::lForida::Florida
+::loFrida::Florida
+::lorFida::Florida
+::loriFda::Florida
+::loridFa::Florida
+::loridaF::Florida
+::Folrida::Florida
+::Forlida::Florida
+::Forilda::Florida
+::Foridla::Florida
+::Foridal::Florida
+::Flroida::Florida
+::Flrioda::Florida
+::Flridoa::Florida
+::Flridao::Florida
+::Floirda::Florida
+::Floidra::Florida
+::Floidar::Florida
+::Flordia::Florida
+::Flordai::Florida
+::Floriad::Florida
+::gmil::gmail
+::gmal::gmail
+::gmai::gmail
+::mgail::gmail
+::magil::gmail
+::maigl::gmail
+::mailg::gmail
+::gamil::gmail
+::gaiml::gmail
+::gailm::gmail
+::gmial::gmail
+::gmila::gmail
+::gmali::gmail
+::eaving::leaving
+::leving::leaving
+::leaing::leaving
+::leavng::leaving
+::leavig::leaving
+::leavin::leaving
+::elaving::leaving
+::ealving::leaving
+::eavling::leaving
+::eavilng::leaving
+::eavinlg::leaving
+::eavingl::leaving
+::laeving::leaving
+::laveing::leaving
+::lavieng::leaving
+::lavineg::leaving
+::lavinge::leaving
+::levaing::leaving
+::leviang::leaving
+::levinag::leaving
+::levinga::leaving
+::leaivng::leaving
+::leainvg::leaving
+::leaingv::leaving
+::leavnig::leaving
+::leavngi::leaving
+::leavign::leaving
+::chedule::schedule
+::shedule::schedule
+::scedule::schedule
+::schdule::schedule
+::scheule::schedule
+::schedle::schedule
+::schedue::schedule
+::schedul::schedule
+::cshedule::schedule
+::chsedule::schedule
+::chesdule::schedule
+::chedsule::schedule
+::chedusle::schedule
+::chedulse::schedule
+::chedules::schedule
+::shcedule::schedule
+::shecdule::schedule
+::shedcule::schedule
+::sheducle::schedule
+::shedulce::schedule
+::shedulec::schedule
+::scehdule::schedule
+::scedhule::schedule
+::sceduhle::schedule
+::scedulhe::schedule
+::sceduleh::schedule
+::schdeule::schedule
+::schduele::schedule
+::schdulee::schedule
+::scheudle::schedule
+::scheulde::schedule
+::scheuled::schedule
+::schedlue::schedule
+::schedleu::schedule
+::scheduel::schedule
+::omments::comments
+::cmments::comments
+::coments::comments
+::commnts::comments
+::commets::comments
+::commens::comments
+::ocmments::comments
+::omcments::comments
+::ommcents::comments
+::ommecnts::comments
+::ommencts::comments
+::ommentcs::comments
+::ommentsc::comments
+::cmoments::comments
+::cmmoents::comments
+::cmmeonts::comments
+::cmmenots::comments
+::cmmentos::comments
+::cmmentso::comments
+::comemnts::comments
+::comenmts::comments
+::comentms::comments
+::comentsm::comments
+::commnets::comments
+::commntes::comments
+::commntse::comments
+::commetns::comments
+::commetsn::comments
+::commenst::comments
+::eceivers::receivers
+::rceivers::receivers
+::reeivers::receivers
+::recivers::receivers
+::recevers::receivers
+::receiers::receivers
+::receivrs::receivers
+::erceivers::receivers
+::ecreivers::receivers
+::ecerivers::receivers
+::eceirvers::receivers
+::eceivrers::receivers
+::eceiverrs::receivers
+::rceeivers::receivers
+::reecivers::receivers
+::reeicvers::receivers
+::reeivcers::receivers
+::reeivecrs::receivers
+::reeivercs::receivers
+::reeiversc::receivers
+::recievers::receivers
+::reciveers::receivers
+::receviers::receivers
+::receveirs::receivers
+::receveris::receivers
+::receversi::receivers
+::receievrs::receivers
+::receiervs::receivers
+::receiersv::receivers
+::receivres::receivers
+::receivrse::receivers
+::receivesr::receivers
+::bject::object
+::oject::object
+::obect::object
+::objct::object
+::objec::object
+::boject::object
+::bjoect::object
+::bjeoct::object
+::bjecot::object
+::bjecto::object
+::ojbect::object
+::ojebct::object
+::ojecbt::object
+::ojectb::object
+::obejct::object
+::obecjt::object
+::obectj::object
+::objcet::object
+::objcte::object
+::objetc::object
+::nver::never
+::neer::never
+::nevr::never
+::enver::never
+::evner::never
+::evenr::never
+::evern::never
+::nveer::never
+::neevr::never
+::neerv::never
+::nevre::never
+::ath::path
+::pth::path
+::apth::path
+::atph::path
+::athp::path
+::ptah::path
+::ptha::path
+::paht::path
+::uys::guys
+::gys::guys
+::ugys::guys
+::uygs::guys
+::uysg::guys
+::gyus::guys
+::gysu::guys
+::gusy::guys
+::itbucket::bitbucket
+::btbucket::bitbucket
+::bibucket::bitbucket
+::bitucket::bitbucket
+::bitbcket::bitbucket
+::bitbuket::bitbucket
+::bitbucet::bitbucket
+::bitbuckt::bitbucket
+::bitbucke::bitbucket
+::ibtbucket::bitbucket
+::itbbucket::bitbucket
+::btibucket::bitbucket
+::btbiucket::bitbucket
+::btbuicket::bitbucket
+::btbuciket::bitbucket
+::btbuckiet::bitbucket
+::btbuckeit::bitbucket
+::btbucketi::bitbucket
+::bibtucket::bitbucket
+::bibutcket::bitbucket
+::bibuctket::bitbucket
+::bibucktet::bitbucket
+::bibuckett::bitbucket
+::bitubcket::bitbucket
+::bitucbket::bitbucket
+::bituckbet::bitbucket
+::bituckebt::bitbucket
+::bitucketb::bitbucket
+::bitbcuket::bitbucket
+::bitbckuet::bitbucket
+::bitbckeut::bitbucket
+::bitbcketu::bitbucket
+::bitbukcet::bitbucket
+::bitbukect::bitbucket
+::bitbuketc::bitbucket
+::bitbucekt::bitbucket
+::bitbucetk::bitbucket
+::bitbuckte::bitbucket
+::wek::week
+::ewek::week
+::eewk::week
+::eekw::week
+::weke::week
+::opy::copy
+::cpy::copy
+::ocpy::copy
+::opcy::copy
+::opyc::copy
+::cpoy::copy
+::cpyo::copy
+::coyp::copy
+::ctually::actually
+::atually::actually
+::acually::actually
+::actally::actually
+::actully::actually
+::actualy::actually
+::actuall::actually
+::catually::actually
+::ctaually::actually
+::ctuaally::actually
+::atcually::actually
+::atucally::actually
+::atuaclly::actually
+::atualcly::actually
+::atuallcy::actually
+::atuallyc::actually
+::acutally::actually
+::acuatlly::actually
+::acualtly::actually
+::acuallty::actually
+::acuallyt::actually
+::actaully::actually
+::actaluly::actually
+::actalluy::actually
+::actallyu::actually
+::actulaly::actually
+::actullay::actually
+::actullya::actually
+::actualyl::actually
+::ompilation::compilation
+::cmpilation::compilation
+::copilation::compilation
+::comilation::compilation
+::complation::compilation
+::compiation::compilation
+::compiltion::compilation
+::compilaion::compilation
+::compilaton::compilation
+::compilatin::compilation
+::compilatio::compilation
+::ocmpilation::compilation
+::omcpilation::compilation
+::ompcilation::compilation
+::ompiclation::compilation
+::ompilcation::compilation
+::ompilaction::compilation
+::ompilatcion::compilation
+::ompilaticon::compilation
+::ompilatiocn::compilation
+::ompilationc::compilation
+::cmopilation::compilation
+::cmpoilation::compilation
+::cmpiolation::compilation
+::cmpiloation::compilation
+::cmpilaotion::compilation
+::cmpilatoion::compilation
+::cmpilatioon::compilation
+::copmilation::compilation
+::copimlation::compilation
+::copilmation::compilation
+::copilamtion::compilation
+::copilatmion::compilation
+::copilatimon::compilation
+::copilatiomn::compilation
+::copilationm::compilation
+::comiplation::compilation
+::comilpation::compilation
+::comilaption::compilation
+::comilatpion::compilation
+::comilatipon::compilation
+::comilatiopn::compilation
+::comilationp::compilation
+::compliation::compilation
+::complaition::compilation
+::complatiion::compilation
+::compialtion::compilation
+::compiatlion::compilation
+::compiatilon::compilation
+::compiatioln::compilation
+::compiationl::compilation
+::compiltaion::compilation
+::compiltiaon::compilation
+::compiltioan::compilation
+::compiltiona::compilation
+::compilaiton::compilation
+::compilaiotn::compilation
+::compilaiont::compilation
+::compilatoin::compilation
+::compilatoni::compilation
+::compilatino::compilation
+::rror::error
+::eror::error
+::errr::error
+::erro::error
+::reror::error
+::rreor::error
+::rroer::error
+::rrore::error
+::erorr::error
+::errro::error
+::nderstand::understand
+::uderstand::understand
+::unerstand::understand
+::undrstand::understand
+::undestand::understand
+::undertand::understand
+::undersand::understand
+::understnd::understand
+::understad::understand
+::understan::understand
+::nuderstand::understand
+::nduerstand::understand
+::ndeurstand::understand
+::nderustand::understand
+::ndersutand::understand
+::nderstuand::understand
+::nderstaund::understand
+::nderstanud::understand
+::nderstandu::understand
+::udnerstand::understand
+::udenrstand::understand
+::udernstand::understand
+::udersntand::understand
+::uderstnand::understand
+::uderstannd::understand
+::unedrstand::understand
+::unerdstand::understand
+::unersdtand::understand
+::unerstdand::understand
+::unerstadnd::understand
+::unerstandd::understand
+::undrestand::understand
+::undrsetand::understand
+::undrsteand::understand
+::undrstaend::understand
+::undrstaned::understand
+::undrstande::understand
+::undesrtand::understand
+::undestrand::understand
+::undestarnd::understand
+::undestanrd::understand
+::undestandr::understand
+::undertsand::understand
+::undertasnd::understand
+::undertansd::understand
+::undertands::understand
+::undersatnd::understand
+::undersantd::understand
+::undersandt::understand
+::understnad::understand
+::understnda::understand
+::understadn::understand
+::ssue::issue
+::isue::issue
+::isse::issue
+::issu::issue
+::sisue::issue
+::ssiue::issue
+::ssuie::issue
+::ssuei::issue
+::isuse::issue
+::isues::issue
+::isseu::issue
+::nother::another
+::aother::another
+::anoher::another
+::anoter::another
+::anothr::another
+::anothe::another
+::naother::another
+::noather::another
+::notaher::another
+::nothaer::another
+::nothear::another
+::nothera::another
+::aonther::another
+::aotnher::another
+::aothner::another
+::aothenr::another
+::aothern::another
+::antoher::another
+::anthoer::another
+::antheor::another
+::anthero::another
+::anohter::another
+::anohetr::another
+::anohert::another
+::anotehr::another
+::anoterh::another
+::anothre::another
+::bjects::objects
+::ojects::objects
+::obects::objects
+::objcts::objects
+::objecs::objects
+::bojects::objects
+::bjoects::objects
+::bjeocts::objects
+::bjecots::objects
+::bjectos::objects
+::bjectso::objects
+::ojbects::objects
+::ojebcts::objects
+::ojecbts::objects
+::ojectbs::objects
+::ojectsb::objects
+::obejcts::objects
+::obecjts::objects
+::obectjs::objects
+::obectsj::objects
+::objcets::objects
+::objctes::objects
+::objctse::objects
+::objetcs::objects
+::objetsc::objects
+::objecst::objects
+::urrent::current
+::crrent::current
+::curent::current
+::currnt::current
+::curret::current
+::curren::current
+::ucrrent::current
+::urcrent::current
+::urrcent::current
+::urrecnt::current
+::urrenct::current
+::urrentc::current
+::crurent::current
+::crruent::current
+::crreunt::current
+::crrenut::current
+::crrentu::current
+::curernt::current
+::curenrt::current
+::curentr::current
+::currnet::current
+::currnte::current
+::curretn::current
+::nly::only
+::oly::only
+::ony::only
+::onl::only
+::noly::only
+::nloy::only
+::nlyo::only
+::olny::only
+::olyn::only
+::onyl::only
+::thng::thing
+::hting::thing
+::hitng::thing
+::hintg::thing
+::hingt::thing
+::tihng::thing
+::tinhg::thing
+::tingh::thing
+::thnig::thing
+::thngi::thing
+::thign::thing
+::fnd::find
+::ifnd::find
+::infd::find
+::indf::find
+::fnid::find
+::fndi::find
+::fidn::find
+::aout::about
+::abot::about
+::abou::about
+::baout::about
+::boaut::about
+::bouat::about
+::bouta::about
+::aobut::about
+::aoubt::about
+::aoutb::about
+::abuot::about
+::abuto::about
+::abotu::about
+::ceck::check
+::chck::check
+::chek::check
+::chec::check
+::hceck::check
+::hecck::check
+::cehck::check
+::cechk::check
+::ceckh::check
+::chcek::check
+::chcke::check
+::chekc::check
+::evice::device
+::dvice::device
+::devce::device
+::devie::device
+::devic::device
+::edvice::device
+::evdice::device
+::evidce::device
+::evicde::device
+::eviced::device
+::dveice::device
+::dviece::device
+::dvicee::device
+::deivce::device
+::deicve::device
+::deicev::device
+::devcie::device
+::devcei::device
+::deviec::device
+::ine::line
+::lne::line
+::ilne::line
+::inle::line
+::inel::line
+::lnie::line
+::lnei::line
+::truct::struct
+::sruct::struct
+::stuct::struct
+::strct::struct
+::struc::struct
+::tsruct::struct
+::trsuct::struct
+::trusct::struct
+::trucst::struct
+::tructs::struct
+::srtuct::struct
+::srutct::struct
+::sructt::struct
+::sturct::struct
+::stucrt::struct
+::stuctr::struct
+::strcut::struct
+::strctu::struct
+::strutc::struct
+::ypedef::typedef
+::tpedef::typedef
+::tyedef::typedef
+::typdef::typedef
+::typeef::typedef
+::typedf::typedef
+::typede::typedef
+::ytpedef::typedef
+::yptedef::typedef
+::ypetdef::typedef
+::ypedtef::typedef
+::ypedetf::typedef
+::ypedeft::typedef
+::tpyedef::typedef
+::tpeydef::typedef
+::tpedyef::typedef
+::tpedeyf::typedef
+::tpedefy::typedef
+::tyepdef::typedef
+::tyedpef::typedef
+::tyedepf::typedef
+::tyedefp::typedef
+::typdeef::typedef
+::typeedf::typedef
+::typeefd::typedef
+::typedfe::typedef
+::andle::handle
+::hndle::handle
+::hadle::handle
+::hanle::handle
+::hande::handle
+::handl::handle
+::ahndle::handle
+::anhdle::handle
+::andhle::handle
+::andlhe::handle
+::andleh::handle
+::hnadle::handle
+::hndale::handle
+::hndlae::handle
+::hndlea::handle
+::hadnle::handle
+::hadlne::handle
+::hadlen::handle
+::hanlde::handle
+::hanled::handle
+::tke::take
+::tak::take
+::atke::take
+::akte::take
+::aket::take
+::tkae::take
+::tkea::take
+::taek::take
+::ven::even
+::evn::even
+::veen::even
+::eevn::even
+::eenv::even
+::evne::even
+::ppears::appears
+::apears::appears
+::appars::appears
+::appers::appears
+::appeas::appears
+::papears::appears
+::ppaears::appears
+::ppeaars::appears
+::apepars::appears
+::apeaprs::appears
+::apearps::appears
+::apearsp::appears
+::appaers::appears
+::appares::appears
+::apparse::appears
+::apperas::appears
+::appersa::appears
+::appeasr::appears
+::indow::window
+::wndow::window
+::winow::window
+::windw::window
+::windo::window
+::iwndow::window
+::inwdow::window
+::indwow::window
+::indoww::window
+::wnidow::window
+::wndiow::window
+::wndoiw::window
+::wndowi::window
+::widnow::window
+::widonw::window
+::widown::window
+::winodw::window
+::winowd::window
+::windwo::window
+::lke::like
+::lik::like
+::ilke::like
+::ikle::like
+::ikel::like
+::lkie::like
+::lkei::like
+::liek::like
+::elieve::believe
+::blieve::believe
+::beieve::believe
+::beleve::believe
+::beliee::believe
+::believ::believe
+::eblieve::believe
+::elbieve::believe
+::elibeve::believe
+::eliebve::believe
+::elievbe::believe
+::elieveb::believe
+::bleieve::believe
+::blieeve::believe
+::beileve::believe
+::beielve::believe
+::beievle::believe
+::beievel::believe
+::beleive::believe
+::belevie::believe
+::belevei::believe
+::belivee::believe
+::belieev::believe
+::asme::same
+::amse::same
+::smae::same
+::smea::same
+::saem::same
+::ased::based
+::bsed::based
+::baed::based
+::basd::based
+::absed::based
+::asbed::based
+::asebd::based
+::asedb::based
+::bsaed::based
+::bsead::based
+::bseda::based
+::baesd::based
+::baeds::based
+::basde::based
+::dne::done
+::odne::done
+::onde::done
+::oned::done
+::dnoe::done
+::dneo::done
+::doen::done
+::ive::give
+::gve::give
+::giv::give
+::igve::give
+::ivge::give
+::iveg::give
+::gvie::give
+::gvei::give
+::giev::give
+::ote::Note
+::Nte::Note
+::Noe::Note
+::oNte::Note
+::otNe::Note
+::oteN::Note
+::Ntoe::Note
+::Nteo::Note
+::Noet::Note
+::nterrupts::interrupts
+::iterrupts::interrupts
+::inerrupts::interrupts
+::intrrupts::interrupts
+::interupts::interrupts
+::interrpts::interrupts
+::interruts::interrupts
+::interrups::interrupts
+::niterrupts::interrupts
+::ntierrupts::interrupts
+::nteirrupts::interrupts
+::nterirupts::interrupts
+::nterriupts::interrupts
+::nterruipts::interrupts
+::nterrupits::interrupts
+::nterruptis::interrupts
+::nterruptsi::interrupts
+::itnerrupts::interrupts
+::itenrrupts::interrupts
+::iternrupts::interrupts
+::iterrnupts::interrupts
+::iterrunpts::interrupts
+::iterrupnts::interrupts
+::iterruptns::interrupts
+::iterruptsn::interrupts
+::inetrrupts::interrupts
+::inertrupts::interrupts
+::inerrtupts::interrupts
+::inerrutpts::interrupts
+::inerruptts::interrupts
+::intrerupts::interrupts
+::intrreupts::interrupts
+::intrruepts::interrupts
+::intrrupets::interrupts
+::intrruptes::interrupts
+::intrruptse::interrupts
+::interurpts::interrupts
+::interuprts::interrupts
+::interuptrs::interrupts
+::interuptsr::interrupts
+::interrputs::interrupts
+::interrptus::interrupts
+::interrptsu::interrupts
+::interrutps::interrupts
+::interrutsp::interrupts
+::interrupst::interrupts
+::Des::Does
+::Dos::Does
+::Doe::Does
+::oDes::Does
+::oeDs::Does
+::oesD::Does
+::Deos::Does
+::Deso::Does
+::Dose::Does
+::verything::everything
+::eerything::everything
+::evrything::everything
+::eveything::everything
+::everthing::everything
+::everyhing::everything
+::everyting::everything
+::everythng::everything
+::everythig::everything
+::everythin::everything
+::veerything::everything
+::eevrything::everything
+::eervything::everything
+::eeryvthing::everything
+::eerytvhing::everything
+::eerythving::everything
+::eerythivng::everything
+::eerythinvg::everything
+::eerythingv::everything
+::evreything::everything
+::evryething::everything
+::evrytehing::everything
+::evrytheing::everything
+::evrythieng::everything
+::evrythineg::everything
+::evrythinge::everything
+::eveyrthing::everything
+::eveytrhing::everything
+::eveythring::everything
+::eveythirng::everything
+::eveythinrg::everything
+::eveythingr::everything
+::evertyhing::everything
+::everthying::everything
+::everthiyng::everything
+::everthinyg::everything
+::everthingy::everything
+::everyhting::everything
+::everyhitng::everything
+::everyhintg::everything
+::everyhingt::everything
+::everytihng::everything
+::everytinhg::everything
+::everytingh::everything
+::everythnig::everything
+::everythngi::everything
+::everythign::everything
+::ecided::decided
+::dcided::decided
+::deided::decided
+::decded::decided
+::decied::decided
+::decidd::decided
+::edcided::decided
+::ecdided::decided
+::ecidded::decided
+::dceided::decided
+::dcieded::decided
+::dcideed::decided
+::deicded::decided
+::deidced::decided
+::deidecd::decided
+::deidedc::decided
+::decdied::decided
+::decdeid::decided
+::decdedi::decided
+::deciedd::decided
+::decidde::decided
+::amed::named
+::nmed::named
+::naed::named
+::namd::named
+::anmed::named
+::amned::named
+::nmaed::named
+::nmead::named
+::nmeda::named
+::naemd::named
+::naedm::named
+::namde::named
+::egister::register
+::rgister::register
+::reister::register
+::regster::register
+::regiter::register
+::regiser::register
+::registr::register
+::registe::register
+::ergister::register
+::egrister::register
+::egirster::register
+::egisrter::register
+::egistrer::register
+::egisterr::register
+::rgeister::register
+::rgiester::register
+::rgiseter::register
+::rgisteer::register
+::reigster::register
+::reisgter::register
+::reistger::register
+::reistegr::register
+::reisterg::register
+::regsiter::register
+::regstier::register
+::regsteir::register
+::regsteri::register
+::regitser::register
+::regitesr::register
+::regiters::register
+::regisetr::register
+::regisert::register
+::registre::register
+::erify::verify
+::vrify::verify
+::veify::verify
+::verfy::verify
+::veriy::verify
+::verif::verify
+::evrify::verify
+::ervify::verify
+::erivfy::verify
+::erifvy::verify
+::erifyv::verify
+::vreify::verify
+::vriefy::verify
+::vrifey::verify
+::vrifye::verify
+::veirfy::verify
+::veifry::verify
+::veifyr::verify
+::verfiy::verify
+::verfyi::verify
+::veriyf::verify
+::stll::still
+::stil::still
+::tsill::still
+::tisll::still
+::tilsl::still
+::sitll::still
+::siltl::still
+::sillt::still
+::stlil::still
+::stlli::still
+::asn::wasn
+::wsn::wasn
+::awsn::wasn
+::aswn::wasn
+::asnw::wasn
+::wsan::wasn
+::wsna::wasn
+::nto::into
+::ino::into
+::int::into
+::nito::into
+::ntio::into
+::ntoi::into
+::itno::into
+::iton::into
+::inot::into
+::thenau::athenau
+::ahenau::athenau
+::atenau::athenau
+::athnau::athenau
+::atheau::athenau
+::athenu::athenau
+::tahenau::athenau
+::thaenau::athenau
+::theanau::athenau
+::thenaau::athenau
+::ahtenau::athenau
+::ahetnau::athenau
+::ahentau::athenau
+::ahenatu::athenau
+::ahenaut::athenau
+::atehnau::athenau
+::atenhau::athenau
+::atenahu::athenau
+::atenauh::athenau
+::athneau::athenau
+::athnaeu::athenau
+::athnaue::athenau
+::atheanu::athenau
+::atheaun::athenau
+::athenua::athenau
+::vFrame::AvFrame
+::AFrame::AvFrame
+::Avrame::AvFrame
+::AvFame::AvFrame
+::AvFrme::AvFrame
+::AvFrae::AvFrame
+::AvFram::AvFrame
+::vAFrame::AvFrame
+::vFArame::AvFrame
+::vFrAame::AvFrame
+::vFraAme::AvFrame
+::vFramAe::AvFrame
+::vFrameA::AvFrame
+::AFvrame::AvFrame
+::AFrvame::AvFrame
+::AFravme::AvFrame
+::AFramve::AvFrame
+::AFramev::AvFrame
+::AvrFame::AvFrame
+::AvraFme::AvFrame
+::AvramFe::AvFrame
+::AvrameF::AvFrame
+::AvFarme::AvFrame
+::AvFamre::AvFrame
+::AvFamer::AvFrame
+::AvFrmae::AvFrame
+::AvFrmea::AvFrame
+::AvFraem::AvFrame
+::thenaU::AthenaU
+::AhenaU::AthenaU
+::AtenaU::AthenaU
+::AthnaU::AthenaU
+::AtheaU::AthenaU
+::AthenU::AthenaU
+::tAhenaU::AthenaU
+::thAenaU::AthenaU
+::theAnaU::AthenaU
+::thenAaU::AthenaU
+::thenaAU::AthenaU
+::thenaUA::AthenaU
+::AhtenaU::AthenaU
+::AhetnaU::AthenaU
+::AhentaU::AthenaU
+::AhenatU::AthenaU
+::AhenaUt::AthenaU
+::AtehnaU::AthenaU
+::AtenhaU::AthenaU
+::AtenahU::AthenaU
+::AtenaUh::AthenaU
+::AthneaU::AthenaU
+::AthnaeU::AthenaU
+::AthnaUe::AthenaU
+::AtheanU::AthenaU
+::AtheaUn::AthenaU
+::AthenUa::AthenaU
+::ssues::issues
+::isses::issues
+::issus::issues
+::sisues::issues
+::ssiues::issues
+::ssuies::issues
+::ssueis::issues
+::ssuesi::issues
+::isuses::issues
+::isuess::issues
+::isseus::issues
+::issesu::issues
+::issuse::issues
+::sbmodules::submodules
+::sumodules::submodules
+::subodules::submodules
+::submdules::submodules
+::submoules::submodules
+::submodles::submodules
+::submodues::submodules
+::submoduls::submodules
+::usbmodules::submodules
+::ubsmodules::submodules
+::ubmsodules::submodules
+::ubmosdules::submodules
+::ubmodsules::submodules
+::ubmodusles::submodules
+::ubmodulses::submodules
+::ubmoduless::submodules
+::sbumodules::submodules
+::sbmuodules::submodules
+::sbmoudules::submodules
+::sbmoduules::submodules
+::sumbodules::submodules
+::sumobdules::submodules
+::sumodbules::submodules
+::sumodubles::submodules
+::sumodulbes::submodules
+::sumodulebs::submodules
+::sumodulesb::submodules
+::subomdules::submodules
+::subodmules::submodules
+::subodumles::submodules
+::subodulmes::submodules
+::subodulems::submodules
+::subodulesm::submodules
+::submdoules::submodules
+::submduoles::submodules
+::submduloes::submodules
+::submduleos::submodules
+::submduleso::submodules
+::submoudles::submodules
+::submouldes::submodules
+::submouleds::submodules
+::submoulesd::submodules
+::submodlues::submodules
+::submodleus::submodules
+::submodlesu::submodules
+::submoduels::submodules
+::submoduesl::submodules
+::submodulse::submodules
+::eet::meet
+::mee::meet
+::emet::meet
+::eemt::meet
+::eetm::meet
+::onitorChannels::MonitorChannels
+::MnitorChannels::MonitorChannels
+::MoitorChannels::MonitorChannels
+::MontorChannels::MonitorChannels
+::MoniorChannels::MonitorChannels
+::MonitrChannels::MonitorChannels
+::MonitoChannels::MonitorChannels
+::Monitorhannels::MonitorChannels
+::MonitorCannels::MonitorChannels
+::MonitorChnnels::MonitorChannels
+::MonitorChanels::MonitorChannels
+::MonitorChannls::MonitorChannels
+::MonitorChannes::MonitorChannels
+::MonitorChannel::MonitorChannels
+::oMnitorChannels::MonitorChannels
+::onMitorChannels::MonitorChannels
+::oniMtorChannels::MonitorChannels
+::onitMorChannels::MonitorChannels
+::onitoMrChannels::MonitorChannels
+::onitorMChannels::MonitorChannels
+::onitorCMhannels::MonitorChannels
+::onitorChMannels::MonitorChannels
+::onitorChaMnnels::MonitorChannels
+::onitorChanMnels::MonitorChannels
+::onitorChannMels::MonitorChannels
+::onitorChanneMls::MonitorChannels
+::onitorChannelMs::MonitorChannels
+::onitorChannelsM::MonitorChannels
+::MnoitorChannels::MonitorChannels
+::MniotorChannels::MonitorChannels
+::MnitoorChannels::MonitorChannels
+::MointorChannels::MonitorChannels
+::MoitnorChannels::MonitorChannels
+::MoitonrChannels::MonitorChannels
+::MoitornChannels::MonitorChannels
+::MoitorCnhannels::MonitorChannels
+::MoitorChnannels::MonitorChannels
+::MoitorChannnels::MonitorChannels
+::MontiorChannels::MonitorChannels
+::MontoirChannels::MonitorChannels
+::MontoriChannels::MonitorChannels
+::MontorCihannels::MonitorChannels
+::MontorChiannels::MonitorChannels
+::MontorChainnels::MonitorChannels
+::MontorChaninels::MonitorChannels
+::MontorChanniels::MonitorChannels
+::MontorChanneils::MonitorChannels
+::MontorChannelis::MonitorChannels
+::MontorChannelsi::MonitorChannels
+::MoniotrChannels::MonitorChannels
+::MoniortChannels::MonitorChannels
+::MoniorCthannels::MonitorChannels
+::MoniorChtannels::MonitorChannels
+::MoniorChatnnels::MonitorChannels
+::MoniorChantnels::MonitorChannels
+::MoniorChanntels::MonitorChannels
+::MoniorChannetls::MonitorChannels
+::MoniorChannelts::MonitorChannels
+::MoniorChannelst::MonitorChannels
+::MonitroChannels::MonitorChannels
+::MonitrCohannels::MonitorChannels
+::MonitrChoannels::MonitorChannels
+::MonitrChaonnels::MonitorChannels
+::MonitrChanonels::MonitorChannels
+::MonitrChannoels::MonitorChannels
+::MonitrChanneols::MonitorChannels
+::MonitrChannelos::MonitorChannels
+::MonitrChannelso::MonitorChannels
+::MonitoCrhannels::MonitorChannels
+::MonitoChrannels::MonitorChannels
+::MonitoCharnnels::MonitorChannels
+::MonitoChanrnels::MonitorChannels
+::MonitoChannrels::MonitorChannels
+::MonitoChannerls::MonitorChannels
+::MonitoChannelrs::MonitorChannels
+::MonitoChannelsr::MonitorChannels
+::MonitorhCannels::MonitorChannels
+::MonitorhaCnnels::MonitorChannels
+::MonitorhanCnels::MonitorChannels
+::MonitorhannCels::MonitorChannels
+::MonitorhanneCls::MonitorChannels
+::MonitorhannelCs::MonitorChannels
+::MonitorhannelsC::MonitorChannels
+::MonitorCahnnels::MonitorChannels
+::MonitorCanhnels::MonitorChannels
+::MonitorCannhels::MonitorChannels
+::MonitorCannehls::MonitorChannels
+::MonitorCannelhs::MonitorChannels
+::MonitorCannelsh::MonitorChannels
+::MonitorChnanels::MonitorChannels
+::MonitorChnnaels::MonitorChannels
+::MonitorChnneals::MonitorChannels
+::MonitorChnnelas::MonitorChannels
+::MonitorChnnelsa::MonitorChannels
+::MonitorChanenls::MonitorChannels
+::MonitorChanelns::MonitorChannels
+::MonitorChanelsn::MonitorChannels
+::MonitorChannles::MonitorChannels
+::MonitorChannlse::MonitorChannels
+::MonitorChannesl::MonitorChannels
+::ulleted::bulleted
+::blleted::bulleted
+::buleted::bulleted
+::bullted::bulleted
+::bulleed::bulleted
+::bulletd::bulleted
+::bullete::bulleted
+::ublleted::bulleted
+::ulbleted::bulleted
+::ullbeted::bulleted
+::ullebted::bulleted
+::ulletbed::bulleted
+::ulletebd::bulleted
+::ulletedb::bulleted
+::bluleted::bulleted
+::bllueted::bulleted
+::blleuted::bulleted
+::blletued::bulleted
+::blleteud::bulleted
+::blletedu::bulleted
+::bulelted::bulleted
+::buletled::bulleted
+::buleteld::bulleted
+::buletedl::bulleted
+::bullteed::bulleted
+::bulleetd::bulleted
+::bulleedt::bulleted
+::bulletde::bulleted
+::ist::list
+::lst::list
+::ilst::list
+::islt::list
+::istl::list
+::lsit::list
+::lsti::list
+::onfused::confused
+::cnfused::confused
+::cofused::confused
+::conused::confused
+::confsed::confused
+::confued::confused
+::confusd::confused
+::ocnfused::confused
+::oncfused::confused
+::onfcused::confused
+::onfucsed::confused
+::onfusced::confused
+::onfusecd::confused
+::onfusedc::confused
+::cnofused::confused
+::cnfoused::confused
+::cnfuosed::confused
+::cnfusoed::confused
+::cnfuseod::confused
+::cnfusedo::confused
+::cofnused::confused
+::cofunsed::confused
+::cofusned::confused
+::cofusend::confused
+::cofusedn::confused
+::conufsed::confused
+::conusfed::confused
+::conusefd::confused
+::conusedf::confused
+::confsued::confused
+::confseud::confused
+::confsedu::confused
+::confuesd::confused
+::confueds::confused
+::confusde::confused
+::mplemented::implemented
+::iplemented::implemented
+::imlemented::implemented
+::impemented::implemented
+::implmented::implemented
+::impleented::implemented
+::implemnted::implemented
+::implemeted::implemented
+::implemened::implemented
+::implementd::implemented
+::implemente::implemented
+::miplemented::implemented
+::mpilemented::implemented
+::mpliemented::implemented
+::mpleimented::implemented
+::mplemiented::implemented
+::mplemeinted::implemented
+::mplemenited::implemented
+::mplementied::implemented
+::mplementeid::implemented
+::mplementedi::implemented
+::ipmlemented::implemented
+::iplmemented::implemented
+::iplemmented::implemented
+::imlpemented::implemented
+::imlepmented::implemented
+::imlempented::implemented
+::imlemepnted::implemented
+::imlemenpted::implemented
+::imlementped::implemented
+::imlementepd::implemented
+::imlementedp::implemented
+::impelmented::implemented
+::impemlented::implemented
+::impemelnted::implemented
+::impemenlted::implemented
+::impementled::implemented
+::impementeld::implemented
+::impementedl::implemented
+::implmeented::implemented
+::impleemnted::implemented
+::impleenmted::implemented
+::impleentmed::implemented
+::impleentemd::implemented
+::impleentedm::implemented
+::implemneted::implemented
+::implemnteed::implemented
+::implemetned::implemented
+::implemetend::implemented
+::implemetedn::implemented
+::implemenetd::implemented
+::implemenedt::implemented
+::implementde::implemented
+::olor::color
+::clor::color
+::coor::color
+::colr::color
+::colo::color
+::oclor::color
+::olcor::color
+::olocr::color
+::olorc::color
+::cloor::color
+::coolr::color
+::coorl::color
+::colro::color
+::revious::previous
+::pevious::previous
+::prvious::previous
+::preious::previous
+::prevous::previous
+::previus::previous
+::previos::previous
+::previou::previous
+::rpevious::previous
+::repvious::previous
+::revpious::previous
+::revipous::previous
+::reviopus::previous
+::revioups::previous
+::reviousp::previous
+::prveious::previous
+::prvieous::previous
+::prvioeus::previous
+::prvioues::previous
+::prviouse::previous
+::preivous::previous
+::preiovus::previous
+::preiouvs::previous
+::preiousv::previous
+::prevoius::previous
+::prevouis::previous
+::prevousi::previous
+::previuos::previous
+::previuso::previous
+::previosu::previous
+::efs::defs
+::dfs::defs
+::edfs::defs
+::efds::defs
+::efsd::defs
+::dfes::defs
+::dfse::defs
+::desf::defs
+::ngth::ength
+::egth::ength
+::enth::ength
+::engh::ength
+::engt::ength
+::negth::ength
+::ngeth::ength
+::ngteh::ength
+::ngthe::ength
+::egnth::ength
+::egtnh::ength
+::egthn::ength
+::entgh::ength
+::enthg::ength
+::enght::ength
+::ointer::pointer
+::ponter::pointer
+::poiter::pointer
+::poiner::pointer
+::pointr::pointer
+::opinter::pointer
+::oipnter::pointer
+::oinpter::pointer
+::ointper::pointer
+::ointepr::pointer
+::ointerp::pointer
+::pionter::pointer
+::pinoter::pointer
+::pintoer::pointer
+::pinteor::pointer
+::pintero::pointer
+::poniter::pointer
+::pontier::pointer
+::ponteir::pointer
+::ponteri::pointer
+::poitner::pointer
+::poitenr::pointer
+::poitern::pointer
+::poinetr::pointer
+::poinert::pointer
+::pointre::pointer
+::orrect::correct
+::crrect::correct
+::corect::correct
+::corrct::correct
+::corret::correct
+::correc::correct
+::ocrrect::correct
+::orcrect::correct
+::orrcect::correct
+::orrecct::correct
+::crorect::correct
+::crroect::correct
+::crreoct::correct
+::crrecot::correct
+::crrecto::correct
+::corerct::correct
+::corecrt::correct
+::corectr::correct
+::corrcet::correct
+::corrcte::correct
+::corretc::correct
+::thenau_develop::athenau_develop
+::ahenau_develop::athenau_develop
+::atenau_develop::athenau_develop
+::athnau_develop::athenau_develop
+::atheau_develop::athenau_develop
+::athenu_develop::athenau_develop
+::athena_develop::athenau_develop
+::athenaudevelop::athenau_develop
+::athenau_evelop::athenau_develop
+::athenau_dvelop::athenau_develop
+::athenau_deelop::athenau_develop
+::athenau_devlop::athenau_develop
+::athenau_deveop::athenau_develop
+::athenau_develp::athenau_develop
+::athenau_develo::athenau_develop
+::tahenau_develop::athenau_develop
+::thaenau_develop::athenau_develop
+::theanau_develop::athenau_develop
+::thenaau_develop::athenau_develop
+::ahtenau_develop::athenau_develop
+::ahetnau_develop::athenau_develop
+::ahentau_develop::athenau_develop
+::ahenatu_develop::athenau_develop
+::ahenaut_develop::athenau_develop
+::ahenau_tdevelop::athenau_develop
+::ahenau_dtevelop::athenau_develop
+::ahenau_detvelop::athenau_develop
+::ahenau_devtelop::athenau_develop
+::ahenau_devetlop::athenau_develop
+::ahenau_develtop::athenau_develop
+::ahenau_develotp::athenau_develop
+::ahenau_developt::athenau_develop
+::atehnau_develop::athenau_develop
+::atenhau_develop::athenau_develop
+::atenahu_develop::athenau_develop
+::atenauh_develop::athenau_develop
+::atenau_hdevelop::athenau_develop
+::atenau_dhevelop::athenau_develop
+::atenau_dehvelop::athenau_develop
+::atenau_devhelop::athenau_develop
+::atenau_devehlop::athenau_develop
+::atenau_develhop::athenau_develop
+::atenau_develohp::athenau_develop
+::atenau_developh::athenau_develop
+::athneau_develop::athenau_develop
+::athnaeu_develop::athenau_develop
+::athnaue_develop::athenau_develop
+::athnau_edevelop::athenau_develop
+::athnau_deevelop::athenau_develop
+::atheanu_develop::athenau_develop
+::atheaun_develop::athenau_develop
+::atheau_ndevelop::athenau_develop
+::atheau_dnevelop::athenau_develop
+::atheau_denvelop::athenau_develop
+::atheau_devnelop::athenau_develop
+::atheau_devenlop::athenau_develop
+::atheau_develnop::athenau_develop
+::atheau_develonp::athenau_develop
+::atheau_developn::athenau_develop
+::athenua_develop::athenau_develop
+::athenu_adevelop::athenau_develop
+::athenu_daevelop::athenau_develop
+::athenu_deavelop::athenau_develop
+::athenu_devaelop::athenau_develop
+::athenu_devealop::athenau_develop
+::athenu_develaop::athenau_develop
+::athenu_develoap::athenau_develop
+::athenu_developa::athenau_develop
+::athena_udevelop::athenau_develop
+::athena_duevelop::athenau_develop
+::athena_deuvelop::athenau_develop
+::athena_devuelop::athenau_develop
+::athena_deveulop::athenau_develop
+::athena_develuop::athenau_develop
+::athena_develoup::athenau_develop
+::athena_developu::athenau_develop
+::athenaud_evelop::athenau_develop
+::athenaude_velop::athenau_develop
+::athenaudev_elop::athenau_develop
+::athenaudeve_lop::athenau_develop
+::athenaudevel_op::athenau_develop
+::athenaudevelo_p::athenau_develop
+::athenaudevelop_::athenau_develop
+::athenau_edvelop::athenau_develop
+::athenau_evdelop::athenau_develop
+::athenau_evedlop::athenau_develop
+::athenau_eveldop::athenau_develop
+::athenau_evelodp::athenau_develop
+::athenau_evelopd::athenau_develop
+::athenau_dveelop::athenau_develop
+::athenau_deevlop::athenau_develop
+::athenau_deelvop::athenau_develop
+::athenau_deelovp::athenau_develop
+::athenau_deelopv::athenau_develop
+::athenau_devleop::athenau_develop
+::athenau_devloep::athenau_develop
+::athenau_devlope::athenau_develop
+::athenau_deveolp::athenau_develop
+::athenau_deveopl::athenau_develop
+::athenau_develpo::athenau_develop
+::ype::type
+::tpe::type
+::typ::type
+::ytpe::type
+::ypte::type
+::ypet::type
+::tpye::type
+::tpey::type
+::tyep::type
+::ose::Jose
+::Jse::Jose
+::Jos::Jose
+::oJse::Jose
+::osJe::Jose
+::oseJ::Jose
+::Jsoe::Jose
+::Jseo::Jose
+::Joes::Jose
+::eal::real
+::ral::real
+::rel::real
+::eral::real
+::rael::real
+::rela::real
+::msked::masked
+::maked::masked
+::maskd::masked
+::maske::masked
+::amsked::masked
+::asmked::masked
+::askmed::masked
+::askemd::masked
+::askedm::masked
+::msaked::masked
+::mskaed::masked
+::mskead::masked
+::mskeda::masked
+::maksed::masked
+::makesd::masked
+::makeds::masked
+::masekd::masked
+::masedk::masked
+::maskde::masked
+::othing::nothing
+::nthing::nothing
+::nohing::nothing
+::nothng::nothing
+::nothig::nothing
+::nothin::nothing
+::onthing::nothing
+::otnhing::nothing
+::othning::nothing
+::othinng::nothing
+::ntohing::nothing
+::nthoing::nothing
+::nthiong::nothing
+::nthinog::nothing
+::nthingo::nothing
+::nohting::nothing
+::nohitng::nothing
+::nohintg::nothing
+::nohingt::nothing
+::notihng::nothing
+::notinhg::nothing
+::notingh::nothing
+::nothnig::nothing
+::nothngi::nothing
+::nothign::nothing
+::reezing::freezing
+::frezing::freezing
+::freezng::freezing
+::freezig::freezing
+::freezin::freezing
+::rfeezing::freezing
+::refezing::freezing
+::reefzing::freezing
+::reezfing::freezing
+::reezifng::freezing
+::reezinfg::freezing
+::reezingf::freezing
+::ferezing::freezing
+::feerzing::freezing
+::feezring::freezing
+::feezirng::freezing
+::feezinrg::freezing
+::feezingr::freezing
+::frezeing::freezing
+::frezieng::freezing
+::frezineg::freezing
+::frezinge::freezing
+::freeizng::freezing
+::freeinzg::freezing
+::freeingz::freezing
+::freeznig::freezing
+::freezngi::freezing
+::freezign::freezing
+::ool::cool
+::ocol::cool
+::oocl::cool
+::oolc::cool
+::orting::sorting
+::srting::sorting
+::soting::sorting
+::sortng::sorting
+::sortig::sorting
+::sortin::sorting
+::osrting::sorting
+::orsting::sorting
+::ortsing::sorting
+::ortisng::sorting
+::ortinsg::sorting
+::ortings::sorting
+::sroting::sorting
+::srtoing::sorting
+::srtiong::sorting
+::srtinog::sorting
+::srtingo::sorting
+::sotring::sorting
+::sotirng::sorting
+::sotinrg::sorting
+::sotingr::sorting
+::soritng::sorting
+::sorintg::sorting
+::soringt::sorting
+::sortnig::sorting
+::sortngi::sorting
+::sortign::sorting
+::bes::best
+::ebst::best
+::esbt::best
+::estb::best
+::bset::best
+::bste::best
+::elec::selec
+::slec::selec
+::seec::selec
+::selc::selec
+::eslec::selec
+::elsec::selec
+::elesc::selec
+::elecs::selec
+::sleec::selec
+::seelc::selec
+::seecl::selec
+::selce::selec
+::sring::string
+::strng::string
+::strin::string
+::tsring::string
+::trsing::string
+::trisng::string
+::trinsg::string
+::trings::string
+::stirng::string
+::stinrg::string
+::stingr::string
+::strnig::string
+::strngi::string
+::strign::string
+::stro::astro
+::atro::astro
+::asro::astro
+::asto::astro
+::astr::astro
+::satro::astro
+::staro::astro
+::strao::astro
+::stroa::astro
+::atsro::astro
+::atrso::astro
+::atros::astro
+::asrto::astro
+::asrot::astro
+::ither::either
+::eiher::either
+::eiter::either
+::eithr::either
+::eithe::either
+::iether::either
+::iteher::either
+::itheer::either
+::etiher::either
+::ethier::either
+::etheir::either
+::etheri::either
+::eihter::either
+::eihetr::either
+::eihert::either
+::eitehr::either
+::eiterh::either
+::eithre::either
+::mport::import
+::iport::import
+::imort::import
+::imprt::import
+::impor::import
+::miport::import
+::mpiort::import
+::mpoirt::import
+::mporit::import
+::mporti::import
+::ipmort::import
+::ipomrt::import
+::ipormt::import
+::iportm::import
+::imoprt::import
+::imorpt::import
+::imortp::import
+::improt::import
+::imprto::import
+::impotr::import
+::cho::echo
+::eho::echo
+::ech::echo
+::ceho::echo
+::cheo::echo
+::choe::echo
+::ehco::echo
+::ehoc::echo
+::ecoh::echo
+::nteresting::interesting
+::iteresting::interesting
+::ineresting::interesting
+::intresting::interesting
+::inteesting::interesting
+::intersting::interesting
+::intereting::interesting
+::interesing::interesting
+::interestng::interesting
+::interestig::interesting
+::interestin::interesting
+::niteresting::interesting
+::ntieresting::interesting
+::nteiresting::interesting
+::nteriesting::interesting
+::ntereisting::interesting
+::nteresiting::interesting
+::nterestiing::interesting
+::itneresting::interesting
+::itenresting::interesting
+::iternesting::interesting
+::iterensting::interesting
+::iteresnting::interesting
+::iterestning::interesting
+::iterestinng::interesting
+::inetresting::interesting
+::inertesting::interesting
+::ineretsting::interesting
+::inerestting::interesting
+::intreesting::interesting
+::inteersting::interesting
+::inteesrting::interesting
+::inteestring::interesting
+::inteestirng::interesting
+::inteestinrg::interesting
+::inteestingr::interesting
+::interseting::interesting
+::intersteing::interesting
+::interstieng::interesting
+::interstineg::interesting
+::interstinge::interesting
+::interetsing::interesting
+::interetisng::interesting
+::interetinsg::interesting
+::interetings::interesting
+::interesitng::interesting
+::interesintg::interesting
+::interesingt::interesting
+::interestnig::interesting
+::interestngi::interesting
+::interestign::interesting
+::alking::talking
+::tlking::talking
+::taling::talking
+::talkng::talking
+::talkig::talking
+::talkin::talking
+::atlking::talking
+::altking::talking
+::alkting::talking
+::alkitng::talking
+::alkintg::talking
+::alkingt::talking
+::tlaking::talking
+::tlkaing::talking
+::tlkiang::talking
+::tlkinag::talking
+::tlkinga::talking
+::takling::talking
+::takilng::talking
+::takinlg::talking
+::takingl::talking
+::talikng::talking
+::talinkg::talking
+::talingk::talking
+::talknig::talking
+::talkngi::talking
+::talkign::talking
+::ossible::possible
+::pssible::possible
+::posible::possible
+::possble::possible
+::possile::possible
+::possibe::possible
+::possibl::possible
+::opssible::possible
+::ospsible::possible
+::osspible::possible
+::ossipble::possible
+::ossibple::possible
+::ossiblpe::possible
+::ossiblep::possible
+::psosible::possible
+::pssoible::possible
+::pssioble::possible
+::pssibole::possible
+::pssibloe::possible
+::pssibleo::possible
+::posisble::possible
+::posibsle::possible
+::posiblse::possible
+::posibles::possible
+::possbile::possible
+::possblie::possible
+::possblei::possible
+::possilbe::possible
+::possileb::possible
+::possibel::possible
+::orecfg::corecfg
+::crecfg::corecfg
+::coecfg::corecfg
+::corcfg::corecfg
+::corefg::corecfg
+::corecg::corecfg
+::corecf::corecfg
+::ocrecfg::corecfg
+::orcecfg::corecfg
+::oreccfg::corecfg
+::croecfg::corecfg
+::creocfg::corecfg
+::crecofg::corecfg
+::crecfog::corecfg
+::crecfgo::corecfg
+::coercfg::corecfg
+::coecrfg::corecfg
+::coecfrg::corecfg
+::coecfgr::corecfg
+::corcefg::corecfg
+::corcfeg::corecfg
+::corcfge::corecfg
+::corefcg::corecfg
+::corefgc::corecfg
+::corecgf::corecfg
+::emove::remove
+::rmove::remove
+::reove::remove
+::remve::remove
+::remoe::remove
+::remov::remove
+::ermove::remove
+::emrove::remove
+::emorve::remove
+::emovre::remove
+::emover::remove
+::rmeove::remove
+::rmoeve::remove
+::rmovee::remove
+::reomve::remove
+::reovme::remove
+::reovem::remove
+::remvoe::remove
+::remveo::remove
+::remoev::remove
+::uer::user
+::usr::user
+::uesr::user
+::uers::user
+::wesome::awesome
+::aesome::awesome
+::awsome::awesome
+::aweome::awesome
+::awesme::awesome
+::awesoe::awesome
+::awesom::awesome
+::aewsome::awesome
+::aeswome::awesome
+::aesowme::awesome
+::aesomwe::awesome
+::aesomew::awesome
+::awseome::awesome
+::awsoeme::awesome
+::awsomee::awesome
+::aweosme::awesome
+::aweomse::awesome
+::aweomes::awesome
+::awesmoe::awesome
+::awesmeo::awesome
+::awesoem::awesome
+::ultiple::multiple
+::mltiple::multiple
+::mutiple::multiple
+::muliple::multiple
+::multple::multiple
+::multile::multiple
+::multipe::multiple
+::multipl::multiple
+::umltiple::multiple
+::ulmtiple::multiple
+::ultmiple::multiple
+::ultimple::multiple
+::ultipmle::multiple
+::ultiplme::multiple
+::ultiplem::multiple
+::mlutiple::multiple
+::mltuiple::multiple
+::mltiuple::multiple
+::mltipule::multiple
+::mltiplue::multiple
+::mltipleu::multiple
+::mutliple::multiple
+::mutilple::multiple
+::mutiplle::multiple
+::mulitple::multiple
+::muliptle::multiple
+::muliplte::multiple
+::muliplet::multiple
+::multpile::multiple
+::multplie::multiple
+::multplei::multiple
+::multilpe::multiple
+::multilep::multiple
+::multipel::multiple
+::erm::term
+::trm::term
+::ter::term
+::etrm::term
+::ertm::term
+::ermt::term
+::trem::term
+::trme::term
+::temr::term
+::ontinue::continue
+::cntinue::continue
+::cotinue::continue
+::coninue::continue
+::contnue::continue
+::contiue::continue
+::contine::continue
+::continu::continue
+::ocntinue::continue
+::onctinue::continue
+::ontcinue::continue
+::onticnue::continue
+::ontincue::continue
+::ontinuce::continue
+::ontinuec::continue
+::cnotinue::continue
+::cntoinue::continue
+::cntionue::continue
+::cntinoue::continue
+::cntinuoe::continue
+::cntinueo::continue
+::cotninue::continue
+::cotinnue::continue
+::conitnue::continue
+::conintue::continue
+::coninute::continue
+::coninuet::continue
+::contniue::continue
+::contnuie::continue
+::contnuei::continue
+::contiune::continue
+::contiuen::continue
+::contineu::continue
+::onsole::console
+::cnsole::console
+::cosole::console
+::conole::console
+::consle::console
+::consoe::console
+::consol::console
+::ocnsole::console
+::oncsole::console
+::onscole::console
+::onsocle::console
+::onsolce::console
+::onsolec::console
+::cnosole::console
+::cnsoole::console
+::cosnole::console
+::cosonle::console
+::cosolne::console
+::cosolen::console
+::conosle::console
+::conolse::console
+::conoles::console
+::consloe::console
+::consleo::console
+::consoel::console
+::xact::exact
+::eact::exact
+::exct::exact
+::exat::exact
+::exac::exact
+::xeact::exact
+::xaect::exact
+::xacet::exact
+::xacte::exact
+::eaxct::exact
+::eacxt::exact
+::eactx::exact
+::excat::exact
+::excta::exact
+::exatc::exact
+::wrd::word
+::wod::word
+::owrd::word
+::orwd::word
+::ordw::word
+::wrod::word
+::wrdo::word
+::wodr::word
+::ssume::assume
+::asume::assume
+::assme::assume
+::assue::assume
+::assum::assume
+::sasume::assume
+::ssaume::assume
+::ssuame::assume
+::ssumae::assume
+::ssumea::assume
+::asusme::assume
+::asumse::assume
+::asumes::assume
+::assmue::assume
+::assmeu::assume
+::assuem::assume
+::usy::busy
+::bsy::busy
+::ubsy::busy
+::usby::busy
+::usyb::busy
+::bsuy::busy
+::bsyu::busy
+::otal::total
+::ttal::total
+::toal::total
+::totl::total
+::tota::total
+::ottal::total
+::ttoal::total
+::ttaol::total
+::ttalo::total
+::toatl::total
+::toalt::total
+::totla::total
+::tep::step
+::sep::step
+::stp::step
+::ste::step
+::tsep::step
+::tesp::step
+::teps::step
+::setp::step
+::stpe::step
+::uing::using
+::usng::using
+::usig::using
+::usin::using
+::uisng::using
+::uinsg::using
+::uings::using
+::usnig::using
+::usngi::using
+::usign::using
+::whre::where
+::wher::where
+::hwere::where
+::hewre::where
+::herwe::where
+::herew::where
+::wehre::where
+::werhe::where
+::wereh::where
+::whree::where
+::wheer::where
+::wong::wrong
+::wrng::wrong
+::wrog::wrong
+::wron::wrong
+::rwong::wrong
+::rowng::wrong
+::ronwg::wrong
+::rongw::wrong
+::worng::wrong
+::wonrg::wrong
+::wongr::wrong
+::wrnog::wrong
+::wrngo::wrong
+::wrogn::wrong
+::prt::part
+::aprt::part
+::arpt::part
+::artp::part
+::patr::part
+::arge::large
+::lrge::large
+::lage::large
+::larg::large
+::alrge::large
+::arlge::large
+::lrage::large
+::lrgae::large
+::lrgea::large
+::lagre::large
+::lareg::large
+::mplitude::amplitude
+::aplitude::amplitude
+::amlitude::amplitude
+::ampitude::amplitude
+::ampltude::amplitude
+::ampliude::amplitude
+::amplitde::amplitude
+::amplitue::amplitude
+::amplitud::amplitude
+::maplitude::amplitude
+::mpalitude::amplitude
+::mplaitude::amplitude
+::mpliatude::amplitude
+::mplitaude::amplitude
+::mplituade::amplitude
+::mplitudae::amplitude
+::mplitudea::amplitude
+::apmlitude::amplitude
+::aplmitude::amplitude
+::aplimtude::amplitude
+::aplitmude::amplitude
+::aplitumde::amplitude
+::aplitudme::amplitude
+::aplitudem::amplitude
+::amlpitude::amplitude
+::amliptude::amplitude
+::amlitpude::amplitude
+::amlitupde::amplitude
+::amlitudpe::amplitude
+::amlitudep::amplitude
+::ampiltude::amplitude
+::ampitlude::amplitude
+::ampitulde::amplitude
+::ampitudle::amplitude
+::ampitudel::amplitude
+::ampltiude::amplitude
+::ampltuide::amplitude
+::ampltudie::amplitude
+::ampltudei::amplitude
+::ampliutde::amplitude
+::ampliudte::amplitude
+::ampliudet::amplitude
+::amplitdue::amplitude
+::amplitdeu::amplitude
+::amplitued::amplitude
+::satus::status
+::sttus::status
+::staus::status
+::stats::status
+::tsatus::status
+::tastus::status
+::tatsus::status
+::tatuss::status
+::sattus::status
+::sttaus::status
+::sttuas::status
+::sttusa::status
+::stauts::status
+::staust::status
+::statsu::status
+::etween::between
+::btween::between
+::beween::between
+::beteen::between
+::betwen::between
+::betwee::between
+::ebtween::between
+::etbween::between
+::etwbeen::between
+::etweben::between
+::etweebn::between
+::etweenb::between
+::bteween::between
+::btweeen::between
+::bewteen::between
+::beweten::between
+::beweetn::between
+::beweent::between
+::betewen::between
+::beteewn::between
+::beteenw::between
+::betwene::between
+::ttenuation::attenuation
+::atenuation::attenuation
+::attnuation::attenuation
+::atteuation::attenuation
+::attenation::attenuation
+::attenution::attenuation
+::attenuaion::attenuation
+::attenuaton::attenuation
+::attenuatin::attenuation
+::attenuatio::attenuation
+::tatenuation::attenuation
+::ttaenuation::attenuation
+::tteanuation::attenuation
+::ttenauation::attenuation
+::ttenuaation::attenuation
+::atetnuation::attenuation
+::atentuation::attenuation
+::atenutation::attenuation
+::atenuattion::attenuation
+::attneuation::attenuation
+::attnueation::attenuation
+::attnuaetion::attenuation
+::attnuateion::attenuation
+::attnuatieon::attenuation
+::attnuatioen::attenuation
+::attnuatione::attenuation
+::atteunation::attenuation
+::atteuantion::attenuation
+::atteuatnion::attenuation
+::atteuatinon::attenuation
+::atteuationn::attenuation
+::attenaution::attenuation
+::attenatuion::attenuation
+::attenatiuon::attenuation
+::attenatioun::attenuation
+::attenationu::attenuation
+::attenutaion::attenuation
+::attenutiaon::attenuation
+::attenutioan::attenuation
+::attenutiona::attenuation
+::attenuaiton::attenuation
+::attenuaiotn::attenuation
+::attenuaiont::attenuation
+::attenuatoin::attenuation
+::attenuatoni::attenuation
+::attenuatino::attenuation
+::culd::could
+::coud::could
+::coul::could
+::oculd::could
+::oucld::could
+::oulcd::could
+::ouldc::could
+::cuold::could
+::culod::could
+::culdo::could
+::colud::could
+::coldu::could
+::coudl::could
+::ottom::bottom
+::bttom::bottom
+::botom::bottom
+::bottm::bottom
+::botto::bottom
+::obttom::bottom
+::otbtom::bottom
+::ottbom::bottom
+::ottobm::bottom
+::ottomb::bottom
+::btotom::bottom
+::bttoom::bottom
+::bototm::bottom
+::botomt::bottom
+::bottmo::bottom
+::ook::look
+::olok::look
+::oolk::look
+::ookl::look
+::loko::look
+::dea::idea
+::iea::idea
+::diea::idea
+::deia::idea
+::deai::idea
+::ieda::idea
+::iead::idea
+::idae::idea
+::whn::when
+::whe::when
+::hwen::when
+::wehn::when
+::wenh::when
+::whne::when
+::nder::under
+::uder::under
+::uner::under
+::undr::under
+::nuder::under
+::nduer::under
+::ndeur::under
+::nderu::under
+::udner::under
+::udenr::under
+::udern::under
+::unedr::under
+::unerd::under
+::undre::under
+::apl::aapl
+::aal::aapl
+::aap::aapl
+::apal::aapl
+::apla::aapl
+::aalp::aapl
+::lue::clue
+::cle::clue
+::clu::clue
+::lcue::clue
+::cule::clue
+::cuel::clue
+::cleu::clue
+::ast::last
+::alst::last
+::aslt::last
+::astl::last
+::lsat::last
+::lsta::last
+::nitial::initial
+::iitial::initial
+::intial::initial
+::iniial::initial
+::inital::initial
+::initil::initial
+::initia::initial
+::niitial::initial
+::iintial::initial
+::iitnial::initial
+::iitinal::initial
+::iitianl::initial
+::iitialn::initial
+::intiial::initial
+::iniital::initial
+::iniiatl::initial
+::iniialt::initial
+::initail::initial
+::initali::initial
+::initila::initial
+::emaphors::semaphors
+::smaphors::semaphors
+::seaphors::semaphors
+::semphors::semaphors
+::semahors::semaphors
+::semapors::semaphors
+::semaphrs::semaphors
+::semaphos::semaphors
+::semaphor::semaphors
+::esmaphors::semaphors
+::emsaphors::semaphors
+::emasphors::semaphors
+::emapshors::semaphors
+::emaphsors::semaphors
+::emaphosrs::semaphors
+::emaphorss::semaphors
+::smeaphors::semaphors
+::smaephors::semaphors
+::smapehors::semaphors
+::smapheors::semaphors
+::smaphoers::semaphors
+::smaphores::semaphors
+::smaphorse::semaphors
+::seamphors::semaphors
+::seapmhors::semaphors
+::seaphmors::semaphors
+::seaphomrs::semaphors
+::seaphorms::semaphors
+::seaphorsm::semaphors
+::sempahors::semaphors
+::semphaors::semaphors
+::semphoars::semaphors
+::semphoras::semaphors
+::semphorsa::semaphors
+::semahpors::semaphors
+::semahoprs::semaphors
+::semahorps::semaphors
+::semahorsp::semaphors
+::semapohrs::semaphors
+::semaporhs::semaphors
+::semaporsh::semaphors
+::semaphros::semaphors
+::semaphrso::semaphors
+::semaphosr::semaphors
+::ooks::looks
+::loks::looks
+::oloks::looks
+::oolks::looks
+::ookls::looks
+::ooksl::looks
+::lokos::looks
+::lokso::looks
+::loosk::looks
+::eman::mean
+::eamn::mean
+::eanm::mean
+::maen::mean
+::mena::mean
+::cheduled::scheduled
+::sheduled::scheduled
+::sceduled::scheduled
+::schduled::scheduled
+::schedled::scheduled
+::schedued::scheduled
+::scheduld::scheduled
+::csheduled::scheduled
+::chseduled::scheduled
+::chesduled::scheduled
+::chedsuled::scheduled
+::chedusled::scheduled
+::chedulsed::scheduled
+::chedulesd::scheduled
+::cheduleds::scheduled
+::shceduled::scheduled
+::shecduled::scheduled
+::shedculed::scheduled
+::sheducled::scheduled
+::shedulced::scheduled
+::shedulecd::scheduled
+::sheduledc::scheduled
+::scehduled::scheduled
+::scedhuled::scheduled
+::sceduhled::scheduled
+::scedulhed::scheduled
+::scedulehd::scheduled
+::sceduledh::scheduled
+::schdeuled::scheduled
+::schdueled::scheduled
+::schduleed::scheduled
+::scheudled::scheduled
+::scheulded::scheduled
+::scheuledd::scheduled
+::schedlued::scheduled
+::schedleud::scheduled
+::schedledu::scheduled
+::schedueld::scheduled
+::scheduedl::scheduled
+::schedulde::scheduled
+::Tam::Team
+::Tem::Team
+::Tea::Team
+::eTam::Team
+::eaTm::Team
+::eamT::Team
+::Taem::Team
+::Tame::Team
+::Tema::Team
+::wrte::write
+::wrie::write
+::rwite::write
+::riwte::write
+::ritwe::write
+::ritew::write
+::wirte::write
+::witre::write
+::witer::write
+::wrtie::write
+::wrtei::write
+::wriet::write
+::ets::gets
+::gts::gets
+::ges::gets
+::egts::gets
+::etgs::gets
+::etsg::gets
+::gtes::gets
+::gtse::gets
+::clls::calls
+::cals::calls
+::aclls::calls
+::alcls::calls
+::allcs::calls
+::allsc::calls
+::clals::calls
+::cllas::calls
+::cllsa::calls
+::calsl::calls
+::uon::upon
+::upn::upon
+::puon::upon
+::poun::upon
+::ponu::upon
+::uopn::upon
+::uonp::upon
+::upno::upon
+::teir::their
+::thei::their
+::hteir::their
+::hetir::their
+::heitr::their
+::heirt::their
+::tehir::their
+::teihr::their
+::teirh::their
+::thier::their
+::thire::their
+::theri::their
+::ublic::public
+::pblic::public
+::pulic::public
+::publc::public
+::publi::public
+::upblic::public
+::ubplic::public
+::ublpic::public
+::ublipc::public
+::ublicp::public
+::pbulic::public
+::pbluic::public
+::pbliuc::public
+::pblicu::public
+::pulbic::public
+::pulibc::public
+::pulicb::public
+::pubilc::public
+::pubicl::public
+::publci::public
+::nmes::names
+::naes::names
+::anmes::names
+::amnes::names
+::nmaes::names
+::nmeas::names
+::nmesa::names
+::naems::names
+::naesm::names
+::namse::names
+::suff::stuff
+::stff::stuff
+::stuf::stuff
+::tsuff::stuff
+::tusff::stuff
+::tufsf::stuff
+::sutff::stuff
+::suftf::stuff
+::sufft::stuff
+::stfuf::stuff
+::stffu::stuff
+::deos::does
+::deso::does
+::eep::keep
+::kee::keep
+::ekep::keep
+::eekp::keep
+::eepk::keep
+::kepe::keep
+::drvers::drivers
+::drivrs::drivers
+::rdivers::drivers
+::ridvers::drivers
+::rivders::drivers
+::rivedrs::drivers
+::riverds::drivers
+::riversd::drivers
+::dirvers::drivers
+::divrers::drivers
+::diverrs::drivers
+::drviers::drivers
+::drveirs::drivers
+::drveris::drivers
+::drversi::drivers
+::drievrs::drivers
+::driervs::drivers
+::driersv::drivers
+::drivres::drivers
+::drivrse::drivers
+::drivesr::drivers
+::ernel::Kernel
+::Krnel::Kernel
+::Kenel::Kernel
+::Kerel::Kernel
+::Kernl::Kernel
+::Kerne::Kernel
+::eKrnel::Kernel
+::erKnel::Kernel
+::ernKel::Kernel
+::erneKl::Kernel
+::ernelK::Kernel
+::Krenel::Kernel
+::Krneel::Kernel
+::Kenrel::Kernel
+::Kenerl::Kernel
+::Kenelr::Kernel
+::Kerenl::Kernel
+::Kereln::Kernel
+::Kernle::Kernel
+::ove::move
+::mve::move
+::mov::move
+::omve::move
+::ovme::move
+::ovem::move
+::mvoe::move
+::mveo::move
+::moev::move
+::eplie::heplie
+::hplie::heplie
+::helie::heplie
+::hepie::heplie
+::heple::heplie
+::hepli::heplie
+::ehplie::heplie
+::ephlie::heplie
+::eplhie::heplie
+::eplihe::heplie
+::eplieh::heplie
+::hpelie::heplie
+::hpleie::heplie
+::hpliee::heplie
+::helpie::heplie
+::helipe::heplie
+::heliep::heplie
+::hepile::heplie
+::hepiel::heplie
+::heplei::heplie
+::cquisition::acquisition
+::aquisition::acquisition
+::acuisition::acquisition
+::acqisition::acquisition
+::acqusition::acquisition
+::acquiition::acquisition
+::acquistion::acquisition
+::acquisiion::acquisition
+::acquisiton::acquisition
+::acquisitin::acquisition
+::acquisitio::acquisition
+::caquisition::acquisition
+::cqauisition::acquisition
+::cquaisition::acquisition
+::cquiasition::acquisition
+::cquisaition::acquisition
+::cquisiation::acquisition
+::cquisitaion::acquisition
+::cquisitiaon::acquisition
+::cquisitioan::acquisition
+::cquisitiona::acquisition
+::aqcuisition::acquisition
+::aqucisition::acquisition
+::aquicsition::acquisition
+::aquiscition::acquisition
+::aquisiction::acquisition
+::aquisitcion::acquisition
+::aquisiticon::acquisition
+::aquisitiocn::acquisition
+::aquisitionc::acquisition
+::acuqisition::acquisition
+::acuiqsition::acquisition
+::acuisqition::acquisition
+::acuisiqtion::acquisition
+::acuisitqion::acquisition
+::acuisitiqon::acquisition
+::acuisitioqn::acquisition
+::acuisitionq::acquisition
+::acqiusition::acquisition
+::acqisuition::acquisition
+::acqisiution::acquisition
+::acqisituion::acquisition
+::acqisitiuon::acquisition
+::acqisitioun::acquisition
+::acqisitionu::acquisition
+::acqusiition::acquisition
+::acquiistion::acquisition
+::acquiitsion::acquisition
+::acquiitison::acquisition
+::acquiitiosn::acquisition
+::acquiitions::acquisition
+::acquistiion::acquisition
+::acquisiiton::acquisition
+::acquisiiotn::acquisition
+::acquisiiont::acquisition
+::acquisitoin::acquisition
+::acquisitoni::acquisition
+::acquisitino::acquisition
+::onstruction::construction
+::cnstruction::construction
+::costruction::construction
+::contruction::construction
+::consruction::construction
+::constuction::construction
+::constrction::construction
+::constrution::construction
+::construcion::construction
+::constructon::construction
+::constructin::construction
+::constructio::construction
+::ocnstruction::construction
+::oncstruction::construction
+::onsctruction::construction
+::onstcruction::construction
+::onstrcuction::construction
+::onstrucction::construction
+::cnostruction::construction
+::cnsotruction::construction
+::cnstoruction::construction
+::cnstrouction::construction
+::cnstruoction::construction
+::cnstrucotion::construction
+::cnstructoion::construction
+::cnstructioon::construction
+::cosntruction::construction
+::costnruction::construction
+::costrnuction::construction
+::costrunction::construction
+::costrucntion::construction
+::costructnion::construction
+::costructinon::construction
+::costructionn::construction
+::contsruction::construction
+::contrsuction::construction
+::contrusction::construction
+::contrucstion::construction
+::contructsion::construction
+::contructison::construction
+::contructiosn::construction
+::contructions::construction
+::consrtuction::construction
+::consrutction::construction
+::consructtion::construction
+::consturction::construction
+::constucrtion::construction
+::constuctrion::construction
+::constuctiron::construction
+::constuctiorn::construction
+::constuctionr::construction
+::constrcution::construction
+::constrctuion::construction
+::constrctiuon::construction
+::constrctioun::construction
+::constrctionu::construction
+::construtcion::construction
+::construticon::construction
+::construtiocn::construction
+::construtionc::construction
+::construciton::construction
+::construciotn::construction
+::construciont::construction
+::constructoin::construction
+::constructoni::construction
+::constructino::construction
+::onstructor::constructor
+::cnstructor::constructor
+::costructor::constructor
+::contructor::constructor
+::consructor::constructor
+::constuctor::constructor
+::constrctor::constructor
+::construtor::constructor
+::construcor::constructor
+::constructr::constructor
+::constructo::constructor
+::ocnstructor::constructor
+::oncstructor::constructor
+::onsctructor::constructor
+::onstcructor::constructor
+::onstrcuctor::constructor
+::onstrucctor::constructor
+::cnostructor::constructor
+::cnsotructor::constructor
+::cnstoructor::constructor
+::cnstrouctor::constructor
+::cnstruoctor::constructor
+::cnstrucotor::constructor
+::cnstructoor::constructor
+::cosntructor::constructor
+::costnructor::constructor
+::costrnuctor::constructor
+::costrunctor::constructor
+::costrucntor::constructor
+::costructnor::constructor
+::costructonr::constructor
+::costructorn::constructor
+::contsructor::constructor
+::contrsuctor::constructor
+::contrusctor::constructor
+::contrucstor::constructor
+::contructsor::constructor
+::contructosr::constructor
+::contructors::constructor
+::consrtuctor::constructor
+::consrutctor::constructor
+::consructtor::constructor
+::consturctor::constructor
+::constucrtor::constructor
+::constuctror::constructor
+::constuctorr::constructor
+::constrcutor::constructor
+::constrctuor::constructor
+::constrctour::constructor
+::constrctoru::constructor
+::construtcor::constructor
+::construtocr::constructor
+::construtorc::constructor
+::construcotr::constructor
+::construcort::constructor
+::constructro::constructor
+::emaphore::semaphore
+::smaphore::semaphore
+::seaphore::semaphore
+::semphore::semaphore
+::semahore::semaphore
+::semapore::semaphore
+::semaphre::semaphore
+::semaphoe::semaphore
+::esmaphore::semaphore
+::emsaphore::semaphore
+::emasphore::semaphore
+::emapshore::semaphore
+::emaphsore::semaphore
+::emaphosre::semaphore
+::emaphorse::semaphore
+::emaphores::semaphore
+::smeaphore::semaphore
+::smaephore::semaphore
+::smapehore::semaphore
+::smapheore::semaphore
+::smaphoere::semaphore
+::smaphoree::semaphore
+::seamphore::semaphore
+::seapmhore::semaphore
+::seaphmore::semaphore
+::seaphomre::semaphore
+::seaphorme::semaphore
+::seaphorem::semaphore
+::sempahore::semaphore
+::semphaore::semaphore
+::semphoare::semaphore
+::semphorae::semaphore
+::semphorea::semaphore
+::semahpore::semaphore
+::semahopre::semaphore
+::semahorpe::semaphore
+::semahorep::semaphore
+::semapohre::semaphore
+::semaporhe::semaphore
+::semaporeh::semaphore
+::semaphroe::semaphore
+::semaphreo::semaphore
+::semaphoer::semaphore
+::mai::mail
+::amil::mail
+::aiml::mail
+::ailm::mail
+::mial::mail
+::mila::mail
+::ounds::Sounds
+::Sunds::Sounds
+::Sonds::Sounds
+::Souds::Sounds
+::Souns::Sounds
+::Sound::Sounds
+::oSunds::Sounds
+::ouSnds::Sounds
+::ounSds::Sounds
+::oundSs::Sounds
+::oundsS::Sounds
+::Suonds::Sounds
+::Sunods::Sounds
+::Sundos::Sounds
+::Sundso::Sounds
+::Sonuds::Sounds
+::Sondus::Sounds
+::Sondsu::Sounds
+::Soudns::Sounds
+::Soudsn::Sounds
+::Sounsd::Sounds
+::appens::happens
+::hppens::happens
+::hapens::happens
+::happns::happens
+::happes::happens
+::ahppens::happens
+::aphpens::happens
+::apphens::happens
+::appehns::happens
+::appenhs::happens
+::appensh::happens
+::hpapens::happens
+::hppaens::happens
+::hppeans::happens
+::hppenas::happens
+::hppensa::happens
+::hapepns::happens
+::hapenps::happens
+::hapensp::happens
+::happnes::happens
+::happnse::happens
+::happesn::happens
+::poit::point
+::poin::point
+::opint::point
+::oipnt::point
+::oinpt::point
+::ointp::point
+::piont::point
+::ponit::point
+::ponti::point
+::poitn::point
+::nvolved::involved
+::ivolved::involved
+::inolved::involved
+::invlved::involved
+::invoved::involved
+::involed::involved
+::involvd::involved
+::nivolved::involved
+::nviolved::involved
+::nvoilved::involved
+::nvolived::involved
+::nvolvied::involved
+::nvolveid::involved
+::nvolvedi::involved
+::ivnolved::involved
+::ivonlved::involved
+::ivolnved::involved
+::ivolvned::involved
+::ivolvend::involved
+::ivolvedn::involved
+::inovlved::involved
+::inolvved::involved
+::invloved::involved
+::invlvoed::involved
+::invlveod::involved
+::invlvedo::involved
+::invovled::involved
+::invoveld::involved
+::invovedl::involved
+::involevd::involved
+::involedv::involved
+::involvde::involved
+::ffort::effort
+::efort::effort
+::effrt::effort
+::effot::effort
+::effor::effort
+::fefort::effort
+::ffeort::effort
+::ffoert::effort
+::fforet::effort
+::fforte::effort
+::efofrt::effort
+::eforft::effort
+::efortf::effort
+::effrot::effort
+::effrto::effort
+::effotr::effort
+::upport::support
+::spport::support
+::suport::support
+::supprt::support
+::suppot::support
+::suppor::support
+::uspport::support
+::upsport::support
+::uppsort::support
+::upposrt::support
+::upporst::support
+::upports::support
+::spuport::support
+::sppuort::support
+::sppourt::support
+::spporut::support
+::spportu::support
+::supoprt::support
+::suporpt::support
+::suportp::support
+::supprot::support
+::supprto::support
+::suppotr::support
+::nless::unless
+::uless::unless
+::uness::unless
+::unlss::unless
+::unles::unless
+::nuless::unless
+::nluess::unless
+::nleuss::unless
+::nlesus::unless
+::nlessu::unless
+::ulness::unless
+::ulenss::unless
+::ulesns::unless
+::ulessn::unless
+::unelss::unless
+::unesls::unless
+::unessl::unless
+::unlses::unless
+::unlsse::unless
+::Aso::Also
+::Alo::Also
+::Als::Also
+::lAso::Also
+::lsAo::Also
+::lsoA::Also
+::Aslo::Also
+::Asol::Also
+::Alos::Also
+::robably::probably
+::pobably::probably
+::prbably::probably
+::proably::probably
+::probbly::probably
+::probaly::probably
+::probaby::probably
+::probabl::probably
+::rpobably::probably
+::ropbably::probably
+::robpably::probably
+::robapbly::probably
+::robabply::probably
+::robablpy::probably
+::robablyp::probably
+::porbably::probably
+::pobrably::probably
+::pobarbly::probably
+::pobabrly::probably
+::pobablry::probably
+::pobablyr::probably
+::prboably::probably
+::prbaobly::probably
+::prbaboly::probably
+::prbabloy::probably
+::prbablyo::probably
+::proabbly::probably
+::probbaly::probably
+::probblay::probably
+::probblya::probably
+::probalby::probably
+::probalyb::probably
+::probabyl::probably
+::undle::bundle
+::bndle::bundle
+::budle::bundle
+::bunle::bundle
+::bunde::bundle
+::bundl::bundle
+::ubndle::bundle
+::unbdle::bundle
+::undble::bundle
+::undlbe::bundle
+::undleb::bundle
+::bnudle::bundle
+::bndule::bundle
+::bndlue::bundle
+::bndleu::bundle
+::budnle::bundle
+::budlne::bundle
+::budlen::bundle
+::bunlde::bundle
+::bunled::bundle
+::bundel::bundle
+::roject::project
+::poject::project
+::prject::project
+::proect::project
+::projct::project
+::projet::project
+::projec::project
+::rpoject::project
+::ropject::project
+::rojpect::project
+::rojepct::project
+::rojecpt::project
+::rojectp::project
+::porject::project
+::pojrect::project
+::pojerct::project
+::pojecrt::project
+::pojectr::project
+::prjoect::project
+::prjeoct::project
+::prjecot::project
+::prjecto::project
+::proejct::project
+::proecjt::project
+::proectj::project
+::projcet::project
+::projcte::project
+::projetc::project
+::shws::shows
+::shos::shows
+::hsows::shows
+::hosws::shows
+::howss::shows
+::sohws::shows
+::sowhs::shows
+::sowsh::shows
+::shwos::shows
+::shwso::shows
+::shosw::shows
+::rpos::repos
+::reos::repos
+::erpos::repos
+::epros::repos
+::epors::repos
+::eposr::repos
+::rpeos::repos
+::rpoes::repos
+::rpose::repos
+::reops::repos
+::reosp::repos
+::repso::repos
+::SAL::OSAL
+::OAL::OSAL
+::OSL::OSAL
+::OSA::OSAL
+::SOAL::OSAL
+::SAOL::OSAL
+::SALO::OSAL
+::OASL::OSAL
+::OALS::OSAL
+::OSLA::OSAL
+::ource::source
+::surce::source
+::sorce::source
+::souce::source
+::soure::source
+::sourc::source
+::osurce::source
+::ousrce::source
+::oursce::source
+::ourcse::source
+::ources::source
+::suorce::source
+::suroce::source
+::surcoe::source
+::surceo::source
+::soruce::source
+::sorcue::source
+::sorceu::source
+::soucre::source
+::soucer::source
+::sourec::source
+::eferencePlatforms::ReferencePlatforms
+::RferencePlatforms::ReferencePlatforms
+::ReerencePlatforms::ReferencePlatforms
+::RefrencePlatforms::ReferencePlatforms
+::RefeencePlatforms::ReferencePlatforms
+::ReferncePlatforms::ReferencePlatforms
+::ReferecePlatforms::ReferencePlatforms
+::ReferenePlatforms::ReferencePlatforms
+::ReferencPlatforms::ReferencePlatforms
+::Referencelatforms::ReferencePlatforms
+::ReferencePatforms::ReferencePlatforms
+::ReferencePltforms::ReferencePlatforms
+::ReferencePlaforms::ReferencePlatforms
+::ReferencePlatorms::ReferencePlatforms
+::ReferencePlatfrms::ReferencePlatforms
+::ReferencePlatfoms::ReferencePlatforms
+::ReferencePlatfors::ReferencePlatforms
+::ReferencePlatform::ReferencePlatforms
+::eRferencePlatforms::ReferencePlatforms
+::efRerencePlatforms::ReferencePlatforms
+::efeRrencePlatforms::ReferencePlatforms
+::eferRencePlatforms::ReferencePlatforms
+::efereRncePlatforms::ReferencePlatforms
+::eferenRcePlatforms::ReferencePlatforms
+::eferencRePlatforms::ReferencePlatforms
+::eferenceRPlatforms::ReferencePlatforms
+::eferencePRlatforms::ReferencePlatforms
+::eferencePlRatforms::ReferencePlatforms
+::eferencePlaRtforms::ReferencePlatforms
+::eferencePlatRforms::ReferencePlatforms
+::eferencePlatfRorms::ReferencePlatforms
+::eferencePlatfoRrms::ReferencePlatforms
+::eferencePlatforRms::ReferencePlatforms
+::eferencePlatformRs::ReferencePlatforms
+::eferencePlatformsR::ReferencePlatforms
+::RfeerencePlatforms::ReferencePlatforms
+::ReefrencePlatforms::ReferencePlatforms
+::ReerfencePlatforms::ReferencePlatforms
+::ReerefncePlatforms::ReferencePlatforms
+::ReerenfcePlatforms::ReferencePlatforms
+::ReerencfePlatforms::ReferencePlatforms
+::ReerencefPlatforms::ReferencePlatforms
+::ReerencePflatforms::ReferencePlatforms
+::ReerencePlfatforms::ReferencePlatforms
+::ReerencePlaftforms::ReferencePlatforms
+::ReerencePlatfforms::ReferencePlatforms
+::RefreencePlatforms::ReferencePlatforms
+::RefeerncePlatforms::ReferencePlatforms
+::RefeenrcePlatforms::ReferencePlatforms
+::RefeencrePlatforms::ReferencePlatforms
+::RefeencerPlatforms::ReferencePlatforms
+::RefeencePrlatforms::ReferencePlatforms
+::RefeencePlratforms::ReferencePlatforms
+::RefeencePlartforms::ReferencePlatforms
+::RefeencePlatrforms::ReferencePlatforms
+::RefeencePlatfrorms::ReferencePlatforms
+::RefeencePlatforrms::ReferencePlatforms
+::RefernecePlatforms::ReferencePlatforms
+::RefernceePlatforms::ReferencePlatforms
+::ReferecnePlatforms::ReferencePlatforms
+::ReferecenPlatforms::ReferencePlatforms
+::ReferecePnlatforms::ReferencePlatforms
+::ReferecePlnatforms::ReferencePlatforms
+::ReferecePlantforms::ReferencePlatforms
+::ReferecePlatnforms::ReferencePlatforms
+::ReferecePlatfnorms::ReferencePlatforms
+::ReferecePlatfonrms::ReferencePlatforms
+::ReferecePlatfornms::ReferencePlatforms
+::ReferecePlatformns::ReferencePlatforms
+::ReferecePlatformsn::ReferencePlatforms
+::ReferenecPlatforms::ReferencePlatforms
+::ReferenePclatforms::ReferencePlatforms
+::ReferenePlcatforms::ReferencePlatforms
+::ReferenePlactforms::ReferencePlatforms
+::ReferenePlatcforms::ReferencePlatforms
+::ReferenePlatfcorms::ReferencePlatforms
+::ReferenePlatfocrms::ReferencePlatforms
+::ReferenePlatforcms::ReferencePlatforms
+::ReferenePlatformcs::ReferencePlatforms
+::ReferenePlatformsc::ReferencePlatforms
+::ReferencPelatforms::ReferencePlatforms
+::ReferencPleatforms::ReferencePlatforms
+::ReferencPlaetforms::ReferencePlatforms
+::ReferencPlateforms::ReferencePlatforms
+::ReferencPlatfeorms::ReferencePlatforms
+::ReferencPlatfoerms::ReferencePlatforms
+::ReferencPlatforems::ReferencePlatforms
+::ReferencPlatformes::ReferencePlatforms
+::ReferencPlatformse::ReferencePlatforms
+::ReferencelPatforms::ReferencePlatforms
+::ReferencelaPtforms::ReferencePlatforms
+::ReferencelatPforms::ReferencePlatforms
+::ReferencelatfPorms::ReferencePlatforms
+::ReferencelatfoPrms::ReferencePlatforms
+::ReferencelatforPms::ReferencePlatforms
+::ReferencelatformPs::ReferencePlatforms
+::ReferencelatformsP::ReferencePlatforms
+::ReferencePaltforms::ReferencePlatforms
+::ReferencePatlforms::ReferencePlatforms
+::ReferencePatflorms::ReferencePlatforms
+::ReferencePatfolrms::ReferencePlatforms
+::ReferencePatforlms::ReferencePlatforms
+::ReferencePatformls::ReferencePlatforms
+::ReferencePatformsl::ReferencePlatforms
+::ReferencePltaforms::ReferencePlatforms
+::ReferencePltfaorms::ReferencePlatforms
+::ReferencePltfoarms::ReferencePlatforms
+::ReferencePltforams::ReferencePlatforms
+::ReferencePltformas::ReferencePlatforms
+::ReferencePltformsa::ReferencePlatforms
+::ReferencePlaftorms::ReferencePlatforms
+::ReferencePlafotrms::ReferencePlatforms
+::ReferencePlafortms::ReferencePlatforms
+::ReferencePlaformts::ReferencePlatforms
+::ReferencePlaformst::ReferencePlatforms
+::ReferencePlatofrms::ReferencePlatforms
+::ReferencePlatorfms::ReferencePlatforms
+::ReferencePlatormfs::ReferencePlatforms
+::ReferencePlatormsf::ReferencePlatforms
+::ReferencePlatfroms::ReferencePlatforms
+::ReferencePlatfrmos::ReferencePlatforms
+::ReferencePlatfrmso::ReferencePlatforms
+::ReferencePlatfomrs::ReferencePlatforms
+::ReferencePlatfomsr::ReferencePlatforms
+::ReferencePlatforsm::ReferencePlatforms
+::flder::folder
+::foder::folder
+::foler::folder
+::foldr::folder
+::folde::folder
+::oflder::folder
+::olfder::folder
+::oldfer::folder
+::oldefr::folder
+::olderf::folder
+::floder::folder
+::fldoer::folder
+::fldeor::folder
+::fldero::folder
+::fodler::folder
+::fodelr::folder
+::foderl::folder
+::foledr::folder
+::folerd::folder
+::foldre::folder
+::trck::track
+::trak::track
+::rtack::track
+::ratck::track
+::ractk::track
+::rackt::track
+::tarck::track
+::tacrk::track
+::tackr::track
+::trcak::track
+::trcka::track
+::trakc::track
+::uch::much
+::mch::much
+::muh::much
+::muc::much
+::umch::much
+::ucmh::much
+::uchm::much
+::mcuh::much
+::mchu::much
+::muhc::much
+::obust::robust
+::rbust::robust
+::robst::robust
+::robut::robust
+::robus::robust
+::orbust::robust
+::obrust::robust
+::oburst::robust
+::obusrt::robust
+::obustr::robust
+::rboust::robust
+::rbuost::robust
+::rbusot::robust
+::rbusto::robust
+::roubst::robust
+::rousbt::robust
+::roustb::robust
+::robsut::robust
+::robstu::robust
+::robuts::robust
+::erviceTimer::ServiceTimer
+::SrviceTimer::ServiceTimer
+::SeviceTimer::ServiceTimer
+::SericeTimer::ServiceTimer
+::ServceTimer::ServiceTimer
+::ServieTimer::ServiceTimer
+::ServicTimer::ServiceTimer
+::Serviceimer::ServiceTimer
+::ServiceTmer::ServiceTimer
+::ServiceTier::ServiceTimer
+::ServiceTimr::ServiceTimer
+::ServiceTime::ServiceTimer
+::eSrviceTimer::ServiceTimer
+::erSviceTimer::ServiceTimer
+::ervSiceTimer::ServiceTimer
+::erviSceTimer::ServiceTimer
+::ervicSeTimer::ServiceTimer
+::erviceSTimer::ServiceTimer
+::erviceTSimer::ServiceTimer
+::erviceTiSmer::ServiceTimer
+::erviceTimSer::ServiceTimer
+::erviceTimeSr::ServiceTimer
+::erviceTimerS::ServiceTimer
+::SreviceTimer::ServiceTimer
+::SrveiceTimer::ServiceTimer
+::SrvieceTimer::ServiceTimer
+::SrviceeTimer::ServiceTimer
+::SevriceTimer::ServiceTimer
+::SevirceTimer::ServiceTimer
+::SevicreTimer::ServiceTimer
+::SevicerTimer::ServiceTimer
+::SeviceTrimer::ServiceTimer
+::SeviceTirmer::ServiceTimer
+::SeviceTimrer::ServiceTimer
+::SeviceTimerr::ServiceTimer
+::SerivceTimer::ServiceTimer
+::SericveTimer::ServiceTimer
+::SericevTimer::ServiceTimer
+::SericeTvimer::ServiceTimer
+::SericeTivmer::ServiceTimer
+::SericeTimver::ServiceTimer
+::SericeTimevr::ServiceTimer
+::SericeTimerv::ServiceTimer
+::ServcieTimer::ServiceTimer
+::ServceiTimer::ServiceTimer
+::ServceTiimer::ServiceTimer
+::ServiecTimer::ServiceTimer
+::ServieTcimer::ServiceTimer
+::ServieTicmer::ServiceTimer
+::ServieTimcer::ServiceTimer
+::ServieTimecr::ServiceTimer
+::ServieTimerc::ServiceTimer
+::ServicTeimer::ServiceTimer
+::ServicTiemer::ServiceTimer
+::ServicTimeer::ServiceTimer
+::ServiceiTmer::ServiceTimer
+::ServiceimTer::ServiceTimer
+::ServiceimeTr::ServiceTimer
+::ServiceimerT::ServiceTimer
+::ServiceTmier::ServiceTimer
+::ServiceTmeir::ServiceTimer
+::ServiceTmeri::ServiceTimer
+::ServiceTiemr::ServiceTimer
+::ServiceTierm::ServiceTimer
+::ServiceTimre::ServiceTimer
+::ndependence::Independence
+::Idependence::Independence
+::Inependence::Independence
+::Indpendence::Independence
+::Indeendence::Independence
+::Indepndence::Independence
+::Indepedence::Independence
+::Indepenence::Independence
+::Independnce::Independence
+::Independece::Independence
+::Independene::Independence
+::Independenc::Independence
+::nIdependence::Independence
+::ndIependence::Independence
+::ndeIpendence::Independence
+::ndepIendence::Independence
+::ndepeIndence::Independence
+::ndepenIdence::Independence
+::ndependIence::Independence
+::ndependeInce::Independence
+::ndependenIce::Independence
+::ndependencIe::Independence
+::ndependenceI::Independence
+::Idnependence::Independence
+::Idenpendence::Independence
+::Idepnendence::Independence
+::Idepenndence::Independence
+::Inedpendence::Independence
+::Inepdendence::Independence
+::Inepedndence::Independence
+::Inependdence::Independence
+::Indpeendence::Independence
+::Indeepndence::Independence
+::Indeenpdence::Independence
+::Indeendpence::Independence
+::Indeendepnce::Independence
+::Indeendenpce::Independence
+::Indeendencpe::Independence
+::Indeendencep::Independence
+::Indepnedence::Independence
+::Indepndeence::Independence
+::Indepednence::Independence
+::Indepedennce::Independence
+::Indepenednce::Independence
+::Indepenendce::Independence
+::Indepenencde::Independence
+::Indepenenced::Independence
+::Independnece::Independence
+::Independncee::Independence
+::Independecne::Independence
+::Independecen::Independence
+::Independenec::Independence
+::EVER::NEVER
+::NVER::NEVER
+::NEER::NEVER
+::NEVR::NEVER
+::NEVE::NEVER
+::ENVER::NEVER
+::EVNER::NEVER
+::EVENR::NEVER
+::EVERN::NEVER
+::NVEER::NEVER
+::NEEVR::NEVER
+::NEERV::NEVER
+::NEVRE::NEVER
+::eing::being
+::beng::being
+::beig::being
+::ebing::being
+::eibng::being
+::einbg::being
+::eingb::being
+::bieng::being
+::bineg::being
+::benig::being
+::bengi::being
+::beign::being
+::perator::operator
+::oerator::operator
+::oprator::operator
+::opeator::operator
+::opertor::operator
+::operaor::operator
+::operatr::operator
+::operato::operator
+::poerator::operator
+::peorator::operator
+::peroator::operator
+::peraotor::operator
+::peratoor::operator
+::oeprator::operator
+::oerpator::operator
+::oeraptor::operator
+::oeratpor::operator
+::oeratopr::operator
+::oeratorp::operator
+::opreator::operator
+::opraetor::operator
+::oprateor::operator
+::opratoer::operator
+::opratore::operator
+::opeartor::operator
+::opeatror::operator
+::opeatorr::operator
+::opertaor::operator
+::opertoar::operator
+::opertora::operator
+::operaotr::operator
+::operaort::operator
+::operatro::operator
+::rTimer::MrTimer
+::MTimer::MrTimer
+::Mrimer::MrTimer
+::MrTmer::MrTimer
+::MrTier::MrTimer
+::MrTimr::MrTimer
+::MrTime::MrTimer
+::rMTimer::MrTimer
+::rTMimer::MrTimer
+::rTiMmer::MrTimer
+::rTimMer::MrTimer
+::rTimeMr::MrTimer
+::rTimerM::MrTimer
+::MTrimer::MrTimer
+::MTirmer::MrTimer
+::MTimrer::MrTimer
+::MTimerr::MrTimer
+::MriTmer::MrTimer
+::MrimTer::MrTimer
+::MrimeTr::MrTimer
+::MrimerT::MrTimer
+::MrTmier::MrTimer
+::MrTmeir::MrTimer
+::MrTmeri::MrTimer
+::MrTiemr::MrTimer
+::MrTierm::MrTimer
+::MrTimre::MrTimer
+::eekly::Weekly
+::Wekly::Weekly
+::Weely::Weekly
+::Weeky::Weekly
+::Weekl::Weekly
+::eWekly::Weekly
+::eeWkly::Weekly
+::eekWly::Weekly
+::eeklWy::Weekly
+::eeklyW::Weekly
+::Wekely::Weekly
+::Wekley::Weekly
+::Weklye::Weekly
+::Weelky::Weekly
+::Weelyk::Weekly
+::Weekyl::Weekly
+::sde::side
+::sie::side
+::isde::side
+::idse::side
+::sdie::side
+::sdei::side
+::sied::side
+::ully::fully
+::flly::fully
+::fuly::fully
+::uflly::fully
+::ulfly::fully
+::ullfy::fully
+::ullyf::fully
+::fluly::fully
+::flluy::fully
+::fllyu::fully
+::fulyl::fully
+::pecificy::specificy
+::secificy::specificy
+::spcificy::specificy
+::speificy::specificy
+::specficy::specificy
+::speciicy::specificy
+::specifcy::specificy
+::specifiy::specificy
+::psecificy::specificy
+::pescificy::specificy
+::pecsificy::specificy
+::pecisficy::specificy
+::pecifsicy::specificy
+::pecifiscy::specificy
+::pecificsy::specificy
+::pecificys::specificy
+::sepcificy::specificy
+::secpificy::specificy
+::secipficy::specificy
+::secifpicy::specificy
+::secifipcy::specificy
+::secificpy::specificy
+::secificyp::specificy
+::spceificy::specificy
+::spcieficy::specificy
+::spcifeicy::specificy
+::spcifiecy::specificy
+::spcificey::specificy
+::spcificye::specificy
+::speicficy::specificy
+::speifcicy::specificy
+::speificcy::specificy
+::specfiicy::specificy
+::speciifcy::specificy
+::speciicfy::specificy
+::speciicyf::specificy
+::specifciy::specificy
+::specifcyi::specificy
+::specifiyc::specificy
+::eceiver::receiver
+::rceiver::receiver
+::reeiver::receiver
+::reciver::receiver
+::recever::receiver
+::receier::receiver
+::receivr::receiver
+::erceiver::receiver
+::ecreiver::receiver
+::eceriver::receiver
+::eceirver::receiver
+::eceivrer::receiver
+::eceiverr::receiver
+::rceeiver::receiver
+::reeciver::receiver
+::reeicver::receiver
+::reeivcer::receiver
+::reeivecr::receiver
+::reeiverc::receiver
+::reciever::receiver
+::reciveer::receiver
+::recevier::receiver
+::receveir::receiver
+::receveri::receiver
+::receievr::receiver
+::receierv::receiver
+::receivre::receiver
+::elping::helping
+::hlping::helping
+::heping::helping
+::helpng::helping
+::helpig::helping
+::helpin::helping
+::ehlping::helping
+::elhping::helping
+::elphing::helping
+::elpihng::helping
+::elpinhg::helping
+::elpingh::helping
+::hleping::helping
+::hlpeing::helping
+::hlpieng::helping
+::hlpineg::helping
+::hlpinge::helping
+::hepling::helping
+::hepilng::helping
+::hepinlg::helping
+::hepingl::helping
+::helipng::helping
+::helinpg::helping
+::helingp::helping
+::helpnig::helping
+::helpngi::helping
+::helpign::helping
+::evelop::develop
+::dvelop::develop
+::deelop::develop
+::devlop::develop
+::deveop::develop
+::develp::develop
+::develo::develop
+::edvelop::develop
+::evdelop::develop
+::evedlop::develop
+::eveldop::develop
+::evelodp::develop
+::evelopd::develop
+::dveelop::develop
+::deevlop::develop
+::deelvop::develop
+::deelovp::develop
+::deelopv::develop
+::devleop::develop
+::devloep::develop
+::devlope::develop
+::deveolp::develop
+::deveopl::develop
+::develpo::develop
+::banch::branch
+::brnch::branch
+::branh::branch
+::branc::branch
+::rbanch::branch
+::rabnch::branch
+::ranbch::branch
+::rancbh::branch
+::ranchb::branch
+::barnch::branch
+::banrch::branch
+::bancrh::branch
+::banchr::branch
+::brnach::branch
+::brncah::branch
+::brncha::branch
+::bracnh::branch
+::brachn::branch
+::branhc::branch
+::uilding::building
+::bilding::building
+::bulding::building
+::buiding::building
+::builing::building
+::buildng::building
+::buildig::building
+::buildin::building
+::ubilding::building
+::uiblding::building
+::uilbding::building
+::uildbing::building
+::uildibng::building
+::uildinbg::building
+::uildingb::building
+::biulding::building
+::biluding::building
+::bilduing::building
+::bildiung::building
+::bildinug::building
+::bildingu::building
+::buliding::building
+::buldiing::building
+::buidling::building
+::buidilng::building
+::buidinlg::building
+::buidingl::building
+::builidng::building
+::builindg::building
+::builingd::building
+::buildnig::building
+::buildngi::building
+::buildign::building
+::ransfer::transfer
+::tansfer::transfer
+::trnsfer::transfer
+::trasfer::transfer
+::tranfer::transfer
+::transer::transfer
+::transfr::transfer
+::transfe::transfer
+::rtansfer::transfer
+::ratnsfer::transfer
+::rantsfer::transfer
+::ranstfer::transfer
+::ransfter::transfer
+::ransfetr::transfer
+::ransfert::transfer
+::tarnsfer::transfer
+::tanrsfer::transfer
+::tansrfer::transfer
+::tansfrer::transfer
+::tansferr::transfer
+::trnasfer::transfer
+::trnsafer::transfer
+::trnsfaer::transfer
+::trnsfear::transfer
+::trnsfera::transfer
+::trasnfer::transfer
+::trasfner::transfer
+::trasfenr::transfer
+::trasfern::transfer
+::tranfser::transfer
+::tranfesr::transfer
+::tranfers::transfer
+::transefr::transfer
+::transerf::transfer
+::transfre::transfer
+::pparently::apparently
+::aparently::apparently
+::apprently::apparently
+::appaently::apparently
+::apparntly::apparently
+::apparetly::apparently
+::apparenly::apparently
+::apparenty::apparently
+::apparentl::apparently
+::paparently::apparently
+::ppaarently::apparently
+::ppaarently::apparently
+::pparaently::apparently
+::ppareantly::apparently
+::pparenatly::apparently
+::pparentaly::apparently
+::pparentlay::apparently
+::pparentlya::apparently
+::apaprently::apparently
+::aparpently::apparently
+::aparepntly::apparently
+::aparenptly::apparently
+::aparentply::apparently
+::aparentlpy::apparently
+::aparentlyp::apparently
+::appraently::apparently
+::appreantly::apparently
+::apprenatly::apparently
+::apprentaly::apparently
+::apprentlay::apparently
+::apprentlya::apparently
+::appaerntly::apparently
+::appaenrtly::apparently
+::appaentrly::apparently
+::appaentlry::apparently
+::appaentlyr::apparently
+::apparnetly::apparently
+::apparntely::apparently
+::apparntley::apparently
+::apparntlye::apparently
+::apparetnly::apparently
+::apparetlny::apparently
+::apparetlyn::apparently
+::apparenlty::apparently
+::apparenlyt::apparently
+::apparentyl::apparently
+::iles::files
+::fles::files
+::ifles::files
+::ilfes::files
+::ilefs::files
+::ilesf::files
+::fiels::files
+::fiesl::files
+::filse::files
+::uma::Puma
+::Pma::Puma
+::Pua::Puma
+::Pum::Puma
+::uPma::Puma
+::umPa::Puma
+::umaP::Puma
+::Pmua::Puma
+::Pmau::Puma
+::Puam::Puma
+::ebugging::debugging
+::dbugging::debugging
+::deugging::debugging
+::debgging::debugging
+::debuging::debugging
+::debuggng::debugging
+::debuggig::debugging
+::debuggin::debugging
+::edbugging::debugging
+::ebdugging::debugging
+::ebudgging::debugging
+::ebugdging::debugging
+::ebuggding::debugging
+::ebuggidng::debugging
+::ebuggindg::debugging
+::ebuggingd::debugging
+::dbeugging::debugging
+::dbuegging::debugging
+::dbugeging::debugging
+::dbuggeing::debugging
+::dbuggieng::debugging
+::dbuggineg::debugging
+::dbugginge::debugging
+::deubgging::debugging
+::deugbging::debugging
+::deuggbing::debugging
+::deuggibng::debugging
+::deugginbg::debugging
+::deuggingb::debugging
+::debguging::debugging
+::debgguing::debugging
+::debggiung::debugging
+::debgginug::debugging
+::debggingu::debugging
+::debugigng::debugging
+::debugingg::debugging
+::debuggnig::debugging
+::debuggngi::debugging
+::debuggign::debugging
